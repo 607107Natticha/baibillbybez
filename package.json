@@ -8,7 +8,7 @@
     "dev": "nodemon src/server.js",
     "build:client": "npm run build --prefix client",
     "build": "npm run build:client && prisma generate",
-    "render-build": "npm ci && npm ci --prefix client && npm run build:client && npx prisma generate",
+    "render-build": "npm ci && npm ci --prefix client && npm run build --prefix client && npx prisma generate",
     "smoke": "node scripts/smoke-test.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

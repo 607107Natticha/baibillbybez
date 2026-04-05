@@ -89,8 +89,12 @@ pm2 start src/server.js --name sabaibill
 โปรเจกต์มีไฟล์ [`render.yaml`](./render.yaml) สำหรับสร้าง Web service ตัวเดียว (build ทั้ง root + `client/` แล้ว `npm start`)
 
 1. Push โค้ดขึ้น GitHub แล้วใน Render เลือก **New → Blueprint** ชี้ repo นี้
-2. **ถ้า build ล้มด้วย exit 127 ตอน `vite build`:** สาเหตุมักเป็นเพราะ `NODE_ENV=production` ทำให้ `npm ci` ไม่ลง devDependencies — โปรเจกต์นี้ย้าย **Vite** (และแพ็กเกจ build ที่จำเป็น) ไปไว้ใน `dependencies` ของ `client` แล้ว และใช้ **`npm run render-build`** เป็น Build command (ดู [`render.yaml`](./render.yaml))  
-   - ถ้าสร้าง Web Service เองใน Render **ไม่ได้**ดึงจาก Blueprint ต้องพิมพ์ Build command ใน Dashboard เองว่า: `npm run render-build`
+2. **Build command ต้องตรงกับ repo:** ใส่ใน Render (Build Command) **ทั้งบรรทัดนี้** (หรือ sync จาก [`render.yaml`](./render.yaml)):
+   ```bash
+   npm ci && npm ci --prefix client && npm run build --prefix client && npx prisma generate
+   ```
+   - **exit 127** = มักเป็นคำสั่งใน Build ผิด / ไม่ตรงกับ repo / ยังไม่ได้ `npm ci` ใน `client` จนมี `vite`
+   - ถ้า Dashboard ยังเป็น command เก่าหรือว่าง — แก้แล้วกด **Clear build cache & deploy**
 3. ใน Render ตั้ง **Build-time environment variable** `VITE_API_URL` = `https://<ชื่อ-service>.onrender.com` (หรือโดเมนของคุณ) แล้ว **Deploy ใหม่** หนึ่งครั้ง เพื่อให้ bundle ของ Vite ชี้ API ถูกต้อง
 4. ตรวจสอบว่า `JWT_SECRET` ถูกตั้งแล้ว (Blueprint สร้างค่าสุ่มได้ — ดูในแท็บ Environment)
 5. ถ้าอยากให้ข้อมูลไม่หายหลัง redeploy — ดูหัวข้อ **4.1** (ต้องเป็นแผนมีค่าใช้จ่าย + disk)

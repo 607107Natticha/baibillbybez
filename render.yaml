@@ -13,7 +13,8 @@ services:
     name: sabai-bill
     runtime: node
     plan: free
-    buildCommand: npm run render-build
+    # Inline build (avoids Dashboard drift + npm script nesting). Paste this in Render if not using Blueprint sync.
+    buildCommand: npm ci && npm ci --prefix client && npm run build --prefix client && npx prisma generate
     startCommand: npx prisma db push && npm start
     envVars:
       - key: NODE_ENV
