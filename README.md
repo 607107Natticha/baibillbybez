@@ -262,13 +262,14 @@ VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
 | `FRONTEND_URL` | Backend | CORS — origin ของหน้าเว็บ คั่นหลายตัวด้วย comma |
 | `CORS_ALLOWED_ORIGINS` | Backend | เพิ่ม origin ที่อนุญาต (คั่นด้วย comma) ใช้คู่กับ `FRONTEND_URL` เมื่อมีหลายหน้าเว็บ |
 | `VITE_API_URL` | ตอน build client | ถ้าไม่ตั้ง = production ใช้ origin เดียวกับหน้าเว็บ; ตั้งเมื่อ API คนละโดเมน |
+| `VITE_SAME_ORIGIN_API` | ตอน build client | ใส่ `true` เมื่อโฮสต์เดียวแต่ยังมี `VITE_API_URL` เก่าใน build (บังคับยิง API ที่ origin เดียวกับ SPA) |
 | `JWT_SECRET` | Backend | ค่าใน `.env.example` (โค้ดเดิมรองรับ JWT; flow ปัจจุบันไม่บังคับส่ง token จากเบราว์เซอร์) |
 
 ---
 
 ## แก้ปัญหาที่พบบ่อย
 
-- **CORS / `No 'Access-Control-Allow-Origin'`** — หน้าเว็บกับ API คนละโดเมน: บนเซิร์ฟเวอร์ API ตั้ง `FRONTEND_URL` หรือ `CORS_ALLOWED_ORIGINS` ให้เป็น URL หน้าเว็บจริง (เช่น `https://baibillbybez.onrender.com`) แล้ว redeploy หรือเปลี่ยนมา **โฮสต์เดียว** และ build โดยไม่ตั้ง `VITE_API_URL`  
+- **CORS / `No 'Access-Control-Allow-Origin'`** — มักเกิดจาก SPA ชี้ API คนละโดเมน (เช่น `billbybz`) แต่ API จริงอยู่ที่โดเมนเดียวกับหน้าเว็บ: ตั้ง **`VITE_SAME_ORIGIN_API=true`** ตอน build (มีใน [`render.yaml`](./render.yaml)) หรือลบ `VITE_API_URL` ออกจาก Build env แล้ว deploy ใหม่ ถ้าแยกโดเมนจริง ให้ตั้ง `FRONTEND_URL` / `CORS_ALLOWED_ORIGINS` บน API  
 - **500 ตอนบันทึก** — รัน `npx prisma db push` และตรวจว่า Backend รันอยู่  
 - **Frontend เรียก API ไม่ถึง** — dev: ตั้ง `VITE_API_URL` ให้ตรงพอร์ต Backend  
 - **โลโก้** — วาง `client/public/logo.png` แล้วรีเฟรชหน้าเว็บ
