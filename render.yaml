@@ -1,26 +1,29 @@
 # SabaiBill on Render (single Web service: API + static SPA)
 # Docs: https://render.com/docs/blueprint-spec
 #
+# Persistent SQLite: Render allows persistent disks only on PAID web services
+# (not Free). See https://render.com/docs/disks
+#
 # Before first successful client build, set in the Render dashboard (Build environment):
 #   VITE_API_URL = https://<your-service-name>.onrender.com
 # Then trigger a new deploy so the SPA calls the correct API origin.
-#
-# Optional: add a Persistent Disk mounted at /var/sabaibill-data and set
-#   DATABASE_URL = file:/var/sabaibill-data/dev.db
-# so SQLite survives redeploys (free tier has limits; see Render docs).
 
 services:
   - type: web
     name: sabai-bill
     runtime: node
-    plan: free
-    # NODE_ENV=production skips devDependencies by default; use render-build (include=dev) or see client package.json.
+    # Starter+ required for disk; Free tier cannot attach persistent disks.
+    plan: starter
+    disk:
+      name: sqlite-data
+      mountPath: /data
+      sizeGB: 5
     buildCommand: npm run render-build
     startCommand: npx prisma db push && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: file:./dev.db
+        value: file:/data/dev.db
       - key: JWT_SECRET
         generateValue: true

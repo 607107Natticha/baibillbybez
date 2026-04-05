@@ -76,7 +76,14 @@ pm2 start src/server.js --name sabaibill
 
 - ฐานข้อมูล SQLite อยู่ที่ไฟล์ **`prisma/dev.db`** เมื่อใช้ `DATABASE_URL="file:./dev.db"` (path สัมพันธ์กับโฟลเดอร์ `prisma/`) — ควร backup เป็นระยะ
 - ต้องรัน `npx prisma generate` และ `npx prisma db push` ก่อนรัน production ครั้งแรก (หรือเมื่อแก้ schema)
-- บน PaaS ที่ดิสก์ไม่ถาวร ข้อมูลอาจหายเมื่อ redeploy — ใช้ **Persistent Disk** (หรือ DB แบบ hosted) ถ้าต้องการเก็บข้อมูลถาวร
+- บน PaaS ที่ดิสก์ไม่ถาวร ข้อมูลอาจหายเมื่อ redeploy — ใช้ **Persistent Disk** (แผนมีค่าใช้จ่ายบน Render) หรือ **PostgreSQL แยก** ถ้าต้องการเก็บข้อมูลถาวร
+
+### 4.1 เก็บข้อมูลบน Render ไม่ให้หาย (SQLite)
+
+- แผน **Free** ของ Render **ใส่ Persistent Disk ไม่ได้** — ไฟล์ `dev.db` บน container จึง **อาจหาย** เมื่อ redeploy/restart ตาม [เอกสาร Persistent Disks](https://render.com/docs/disks)
+- ถ้าต้องการให้ SQLite **คงอยู่ข้าม deploy** ต้องใช้ **Web Service แบบมีค่าใช้จ่าย (เช่น Starter)** แล้วแนบ disk
+- ใน repo นี้ [`render.yaml`](./render.yaml) ตั้งไว้เป็น **`plan: starter`** + disk mount **`/data`** ขนาด **5 GB** และ **`DATABASE_URL=file:/data/dev.db`** (ปรับขนาด disk ใน Dashboard ได้ภายหลัง แต่ลดขนาดไม่ได้)
+- ถ้าคุณสร้าง service แบบ **Free** ไว้แล้ว: ไปที่ **Settings** → อัปเกรด instance → **Disks** → เพิ่ม disk ที่ mount path **`/data`** → ตั้ง environment **`DATABASE_URL=file:/data/dev.db`** → Deploy ใหม่ (ฐานข้อมูลบน disk ใหม่จะว่าง — ผู้ใช้ต้องสมัครใหม่ หรือคุณ migrate ไฟล์ db เองถ้าจำเป็น)
 
 ### 5. Deploy บน Render (Blueprint)
 
@@ -87,7 +94,7 @@ pm2 start src/server.js --name sabaibill
    - ถ้าสร้าง Web Service เองใน Render **ไม่ได้**ดึงจาก Blueprint ต้องพิมพ์ Build command ใน Dashboard เองว่า: `npm run render-build`
 3. ใน Render ตั้ง **Build-time environment variable** `VITE_API_URL` = `https://<ชื่อ-service>.onrender.com` (หรือโดเมนของคุณ) แล้ว **Deploy ใหม่** หนึ่งครั้ง เพื่อให้ bundle ของ Vite ชี้ API ถูกต้อง
 4. ตรวจสอบว่า `JWT_SECRET` ถูกตั้งแล้ว (Blueprint สร้างค่าสุ่มได้ — ดูในแท็บ Environment)
-5. (ทางเลือก) Mount **Persistent Disk** แล้วตั้ง `DATABASE_URL=file:/path/on/disk/dev.db` ตาม path ที่ Render กำหนด
+5. เรื่อง disk / `DATABASE_URL` สำหรับข้อมูลถาวร — ดูหัวข้อ **4.1** ด้านบน (Blueprint ปัจจุบันผูก SQLite กับ disk ที่ `/data` แล้ว)
 
 ทดสอบหลัง deploy:
 
