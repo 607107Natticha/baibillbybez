@@ -24,20 +24,9 @@ const PreviewDocument = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-        
-        // Fetch document and settings in parallel
         const [docRes, settingsRes] = await Promise.all([
-          axios.get(`${API_URL}/api/documents/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          axios.get(`${API_URL}/api/settings`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          axios.get(`${API_URL}/api/documents/${id}`),
+          axios.get(`${API_URL}/api/settings`),
         ]);
         
         setDocument(docRes.data);
@@ -147,10 +136,7 @@ const PreviewDocument = () => {
 
   const handleStatusUpdate = async (newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`${API_URL}/api/documents/${id}/status`, { status: newStatus }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`${API_URL}/api/documents/${id}/status`, { status: newStatus });
       setDocument(prev => ({ ...prev, status: newStatus }));
     } catch (error) {
       alert(language === 'th' ? 'ไม่สามารถอัปเดตสถานะได้' : 'Failed to update status');

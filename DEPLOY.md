@@ -141,8 +141,8 @@ SMOKE_BASE_URL=https://your-service.onrender.com npm run smoke
 
 สำหรับผู้ใช้ปลายทางที่เข้าใช้แอปหลัง deploy แล้ว:
 
-1. **เปิดเว็บ** → ลงทะเบียน (อีเมล + PIN 6 หลัก) หรือล็อกอิน
-2. **Onboarding** — กรอกข้อมูลบริษัทครั้งแรก (ชื่อ ที่อยู่ เลขประจำตัวผู้เสียภาษี ฯลฯ)
+1. **เปิดเว็บ** → กด **เข้าใช้งาน** (ไม่มีหน้าสมัคร/ล็อกอินแยก)
+2. **Onboarding** — กรอกข้อมูลบริษัทครั้งแรก (ชื่อ ที่อยู่ เลขประจำตัวผู้เสียภาษี ฯลฯ) ถ้ายังไม่เคยทำ
 3. **ตั้งค่า** (Settings):
    - ข้อมูลบริษัท, ธนาคาร, เงื่อนไขท้ายบิล
    - เทมเพลต (รูปแบบ layout, สี)
@@ -164,4 +164,4 @@ SMOKE_BASE_URL=https://your-service.onrender.com npm run smoke
 | `FRONTEND_URL` | Backend | คั่นด้วย comma ได้ ใช้สำหรับ CORS |
 | `VITE_API_URL` | Frontend (build time) | origin ของ API สำหรับเรียก `${VITE_API_URL}/api/...` |
 | `DATABASE_URL` | Prisma | SQLite ค่าเริ่มต้น `file:./dev.db` → ไฟล์ที่ `prisma/dev.db` |
-| `JWT_SECRET` | Backend | ลงชื่อ JWT — ต้องเป็นความลับใน production |
+| `JWT_SECRET` | Backend | (ถ้ามีในโค้ดเดิม) ค่าลับสำหรับ JWT — flow ปัจจุบันเป็น single-user demo โดยไม่ส่ง token |

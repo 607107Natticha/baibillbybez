@@ -6,9 +6,9 @@
 - **ที่เก็บโค้ด (GitHub):** [github.com/607107Natticha/baibillbybez](https://github.com/607107Natticha/baibillbybez)
 
 **Clone โปรเจกต์:** `git clone https://github.com/607107Natticha/baibillbybez.git`
-- **ลำดับทดลอง:** เปิด URL → สมัครสมาชิก (email + PIN 6 หลัก) → กรอก onboarding ข้อมูลบริษัท → สร้างเอกสาร (QT/SO/DO/IV) → ลองพิมพ์หรือบันทึก PDF จากหน้า Preview
+- **ลำดับทดลอง:** เปิด URL → กด **เข้าใช้งาน** → ถ้ายังไม่กรอกข้อมูลบริษัทจะไปหน้า onboarding → จากนั้นสร้างเอกสาร (QT/SO/DO/IV) → ลองพิมพ์หรือบันทึก PDF จากหน้า Preview  
 - **Render แบบ Free:** ครั้งแรกหลังเว็บหยุดไปนานอาจ **หน่วง ~1 นาที** (cold start) — ยอมรับได้สำหรับ demo; ข้อมูล SQLite อาจ **รีเซ็ต** เมื่อ redeploy ถ้าไม่ใช้ disk แบบมีค่าใช้จ่าย (ดู [DEPLOY.md](./DEPLOY.md) หัวข้อ **4.1** ถ้าอยากเก็บถาวร)  
-- **Google Login:** ใช้ได้เมื่อตั้งค่า OAuth ใน Google Cloud ให้ตรง **Authorized JavaScript origins** และ redirect ของ URL จริง — ถ้ายังไม่ตั้ง ให้ใช้การเข้าสู่ระบบด้วย email + PIN
+- **ไม่มีระบบล็อกอินแยกผู้ใช้:** demo ใช้ผู้ใช้คนเดียวในระบบ (API ไม่ต้องส่ง token) — เหมาะกับการทดลองส่วนตัว ไม่ควรเปิดเป็นข้อมูลลับโดยไม่มีชั้นป้องกันอื่น
 
 รายละเอียด deploy แบบโฮสต์เดียว / Render Blueprint — ดู [DEPLOY.md](./DEPLOY.md)
 
@@ -18,7 +18,7 @@
 SMOKE_BASE_URL=https://your-demo.example.com npm run smoke
 ```
 
-จากนั้นเปิด URL ในเบราว์เซอร์ — ลองครบ flow: สมัคร → onboarding → สร้างเอกสาร → หน้า Preview → พิมพ์หรือบันทึก PDF
+จากนั้นเปิด URL ในเบราว์เซอร์ — ลองครบ flow: เข้าใช้งาน → onboarding (ถ้ายังไม่เคย) → สร้างเอกสาร → หน้า Preview → พิมพ์หรือบันทึก PDF
 
 ---
 
@@ -41,13 +41,13 @@ npm install
 
 ### 2. ตั้งค่าฐานข้อมูล
 
-สำเนาไฟล์ environment แล้วแก้ค่าที่จำเป็น (อย่างน้อย `JWT_SECRET`; ถ้ายังไม่มี `DATABASE_URL` ให้คัดลอกจากตัวอย่าง):
+สำเนาไฟล์ environment แล้วแก้ค่าที่จำเป็น (ถ้ายังไม่มี `DATABASE_URL` ให้คัดลอกจากตัวอย่าง; `JWT_SECRET` ยังเก็บไว้ใน `.env.example` เพื่อความเข้ากันได้กับโค้ดเดิม แต่ flow ปัจจุบันไม่บังคับใช้):
 
 ```bash
 # ในโฟลเดอร์ root — ถ้ายังไม่มี .env
 cp .env.example .env
 # Windows (cmd): copy .env.example .env
-# จากนั้นแก้ JWT_SECRET และยืนยัน DATABASE_URL (ค่าเริ่มต้น SQLite อยู่ที่ prisma/dev.db)
+# จากนั้นยืนยัน DATABASE_URL (ค่าเริ่มต้น SQLite อยู่ที่ prisma/dev.db)
 ```
 
 ```bash
@@ -86,10 +86,9 @@ npx vite
 ## 📋 การใช้งานครั้งแรก
 
 1. **เปิดเบราว์เซอร์** ไปที่ http://localhost:5173
-2. **สมัครสมาชิก** (ใช้ email ใดๆ + PIN 6 หลัก)
-3. **Login** ด้วย email และ PIN
-4. **Onboarding** — กรอกข้อมูลบริษัท (จำเป็นต้องกรอกให้ครบ)
-5. **เริ่มสร้างเอกสาร** ได้ทันที
+2. **กดเข้าใช้งาน** — ระบบจะพาไปหน้า onboarding ถ้ายังไม่กรอกข้อมูลบริษัท หรือไปแดชบอร์ดถ้าทำแล้ว
+3. **Onboarding** — กรอกข้อมูลบริษัท (จำเป็นต้องกรอกให้ครบ)
+4. **เริ่มสร้างเอกสาร** ได้ทันที
 
 **คู่มือการใช้งานทั้งหมด (รวมถึงตั้งค่าสกุลเงิน, หัก ณ ที่จ่าย, พิมพ์/PDF, สลับสกุลเงิน)** — ดูใน [DEPLOY.md](./DEPLOY.md#ขั้นตอนการใช้งานทั้งหมดคู่มือผู้ใช้)
 
@@ -224,7 +223,7 @@ npm run dev
 ## ขั้นตอนตรวจสอบด้วยตัวเอง (Manual)
 
 1. **ใส่ไฟล์โลโก้**: วาง `logo.png` ที่ `client/public/logo.png` แล้วรัน frontend เปิด http://localhost:5173 — ตรวจว่า favicon และ navbar แสดงโลโก้
-2. **Login → Dashboard**: เข้าสู่ระบบแล้วดูว่าหน้า Dashboard โหลดและดึงรายการเอกสารได้
+2. **เข้าใช้งาน → Dashboard**: จากหน้าแรกกดเข้าใช้งานแล้วดูว่าหน้า Dashboard โหลดและดึงรายการเอกสารได้ (หลัง onboarding)
 3. **Settings**: เปิด Settings แก้ไขแล้วบันทึก — ตรวจว่า PUT `/api/settings` ทำงาน
 4. **Preview เอกสาร**: เปิดเอกสารใดๆ — ตรวจว่า theme และโลโก้ (หรือ fallback `/logo.png`) แสดงถูกต้อง
 

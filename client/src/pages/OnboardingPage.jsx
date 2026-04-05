@@ -96,10 +96,7 @@ const OnboardingPage = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${API_URL}/api/onboarding/complete`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API_URL}/api/onboarding/complete`, formData);
       
       alert('บันทึกข้อมูลสำเร็จ! ยินดีต้อนรับสู่ระบบสบายบิล');
       navigate('/dashboard');

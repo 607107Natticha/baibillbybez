@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const CURRENCY_DISPLAY_KEY = 'sabaibill_currency_display';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const PROTECTED_PATHS = ['/dashboard', '/history', '/customers', '/settings', '/create-document', '/documents'];
+const PROTECTED_PATHS = ['/dashboard', '/history', '/customers', '/settings', '/create-document', '/documents', '/onboarding'];
 
 const CurrencyContext = createContext({
   displayCurrency: 'primary',
@@ -19,10 +19,9 @@ export function CurrencyProvider({ children }) {
   const [currencySettings, setCurrencySettings] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     const onProtected = PROTECTED_PATHS.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
-    if (!token || !onProtected) return;
-    axios.get(`${API_URL}/api/settings`, { headers: { Authorization: `Bearer ${token}` } })
+    if (!onProtected) return;
+    axios.get(`${API_URL}/api/settings`)
       .then((res) => setCurrencySettings(res.data))
       .catch(() => setCurrencySettings(null));
   }, [location.pathname]);

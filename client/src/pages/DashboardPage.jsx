@@ -52,29 +52,21 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) { navigate('/login'); return; }
-
       try {
-        const docRes = await axios.get(`${API_URL}/api/documents`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const docRes = await axios.get(`${API_URL}/api/documents`);
         setDocuments(docRes.data);
 
-        const settingsRes = await axios.get(`${API_URL}/api/settings`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const settingsRes = await axios.get(`${API_URL}/api/settings`);
         setCompanyNameTh(settingsRes.data.companyName || 'บริษัท');
         setCompanyNameEn(settingsRes.data.companyNameEn || settingsRes.data.companyName || 'Company');
         setLoading(false);
       } catch (error) {
         console.error('Error:', error);
-        if (error.response?.status === 401) navigate('/login');
         setLoading(false);
       }
     };
     fetchData();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return (

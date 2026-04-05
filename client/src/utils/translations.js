@@ -210,6 +210,7 @@ export const translations = {
     history: 'ประวัติ',
     dashboard: 'แดชบอร์ด',
     logout: 'ออกระบบ',
+    backToEntry: 'หน้าแรก',
   },
   
   en: {
@@ -421,6 +422,7 @@ export const translations = {
     history: 'History',
     dashboard: 'Dashboard',
     logout: 'Logout',
+    backToEntry: 'Start',
   }
 };
 

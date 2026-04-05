@@ -4,7 +4,7 @@ import {
   ClockIcon,
   UsersIcon,
   Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
+  ArrowUturnLeftIcon,
   GlobeAltIcon,
 } from '@heroicons/react/24/outline';
 import { t } from '../utils/translations';
@@ -26,9 +26,8 @@ export default function AppLayout({ children, title }) {
   const setLanguage = useSetLanguage();
   const { displayCurrency, setDisplayCurrency, currencySettings } = useCurrency();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleBackToEntry = () => {
+    navigate('/');
   };
 
   const toggleLanguage = () => {
@@ -49,7 +48,7 @@ export default function AppLayout({ children, title }) {
             <img src="/logo.png" alt="Sabaibill" className="h-9 w-9 shrink-0 object-contain rounded-full border border-gray-100" />
           </Link>
 
-          {/* Mobile: สกุลเงิน (ถ้ามี) | เปลี่ยนภาษา | ออกระบบ */}
+          {/* Mobile: สกุลเงิน (ถ้ามี) | เปลี่ยนภาษา | หน้าแรก */}
           <div className="flex lg:hidden items-center justify-end gap-2 min-w-0">
             {currencySettings?.secondaryCurrency && (
               <button
@@ -69,16 +68,17 @@ export default function AppLayout({ children, title }) {
               <span className="text-sm whitespace-nowrap">{language === 'th' ? 'TH' : 'EN'}</span>
             </button>
             <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl min-h-touch text-red-600 hover:bg-red-50 transition-colors font-medium text-sm touch-target"
-              aria-label={t('logout', language)}
+              type="button"
+              onClick={handleBackToEntry}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl min-h-touch text-gray-600 hover:bg-gray-100 transition-colors font-medium text-sm touch-target"
+              aria-label={t('backToEntry', language)}
             >
-              <ArrowRightOnRectangleIcon className="w-5 h-5 shrink-0" />
-              <span className="text-sm whitespace-nowrap">{t('logout', language)}</span>
+              <ArrowUturnLeftIcon className="w-5 h-5 shrink-0" />
+              <span className="text-sm whitespace-nowrap">{t('backToEntry', language)}</span>
             </button>
           </div>
 
-          {/* Desktop: โลโก้ | หน้าหลัก | ประวัติ | ลูกค้า | ตั้งค่า | เปลี่ยนภาษา | ออกระบบ */}
+          {/* Desktop: โลโก้ | หน้าหลัก | ประวัติ | ลูกค้า | ตั้งค่า | เปลี่ยนภาษา | หน้าแรก */}
           <div className="hidden lg:flex items-center justify-end gap-2 min-w-0">
             {navItems.map(({ path, labelKey, Icon }) => (
               <Link
@@ -115,12 +115,13 @@ export default function AppLayout({ children, title }) {
             </button>
             <span className="w-px h-5 bg-gray-200 shrink-0" aria-hidden />
             <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl min-h-touch text-red-600 hover:bg-red-50 transition-colors font-medium text-sm"
-              aria-label={t('logout', language)}
+              type="button"
+              onClick={handleBackToEntry}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl min-h-touch text-gray-600 hover:bg-gray-100 transition-colors font-medium text-sm"
+              aria-label={t('backToEntry', language)}
             >
-              <ArrowRightOnRectangleIcon className="w-5 h-5 shrink-0" />
-              <span className="text-sm whitespace-nowrap">{t('logout', language)}</span>
+              <ArrowUturnLeftIcon className="w-5 h-5 shrink-0" />
+              <span className="text-sm whitespace-nowrap">{t('backToEntry', language)}</span>
             </button>
           </div>
         </div>

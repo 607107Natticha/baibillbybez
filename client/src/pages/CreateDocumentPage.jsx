@@ -19,10 +19,7 @@ const SmartInput = ({ label, value, onChange, onSelect, type, placeholder, class
     if (!value || !show) return;
     const timeoutId = setTimeout(async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`${API_URL}/api/search?type=${type}&q=${value}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_URL}/api/search?type=${type}&q=${value}`);
         setSuggestions(res.data);
       } catch (e) { console.error(e); }
     }, 150); // Delay 150ms for faster response
@@ -190,11 +187,7 @@ const CreateDocumentPage = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const res = await axios.get(`${API_URL}/api/settings`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_URL}/api/settings`);
         // ตั้งค่า Note เริ่มต้นตามประเภทเอกสาร
         const settings = res.data;
         let defaultNote = '';
@@ -215,11 +208,7 @@ const CreateDocumentPage = () => {
   useEffect(() => {
     const fetchPopularProducts = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const res = await axios.get(`${API_URL}/api/products/popular`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_URL}/api/products/popular`);
         setPopularProducts(res.data);
       } catch (error) {
         console.error('Failed to fetch popular products', error);
@@ -278,15 +267,10 @@ const CreateDocumentPage = () => {
     }
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const settingsRes = await axios.get(`${API_URL}/api/settings`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const settingsRes = await axios.get(`${API_URL}/api/settings`);
       const preparerName = settingsRes.data?.preparerName || formData.preparerName || '';
       const payload = { ...formData, preparerName };
-      const res = await axios.post(`${API_URL}/api/documents`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.post(`${API_URL}/api/documents`, payload);
       try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
       setLastDraftSavedAt(null);
       setSaveSuccess(true);
@@ -485,8 +469,7 @@ const CreateDocumentPage = () => {
                     setShowCustomerPicker(true);
                     setCustomerListLoading(true);
                     try {
-                      const token = localStorage.getItem('token');
-                      const res = await axios.get(`${API_URL}/api/customers`, { headers: { Authorization: `Bearer ${token}` } });
+                      const res = await axios.get(`${API_URL}/api/customers`);
                       setCustomerList(res.data || []);
                     } catch (e) {
                       console.error(e);
@@ -533,7 +516,6 @@ const CreateDocumentPage = () => {
                   type="button"
                   onClick={async () => {
                     try {
-                      const token = localStorage.getItem('token');
                       await axios.post(`${API_URL}/api/customers`, {
                         name: formData.customer || formData.customerEn,
                         nameEn: formData.customerEn,
@@ -541,8 +523,6 @@ const CreateDocumentPage = () => {
                         addressEn: formData.customerAddressEn,
                         taxId: formData.customerTaxId,
                         phone: formData.customerPhone
-                      }, {
-                        headers: { Authorization: `Bearer ${token}` }
                       });
                       setCustomerExists(true);
                       alert(language === 'th' ? '✅ บันทึกลูกค้าสำเร็จ! ระบบจะจำข้อมูลนี้ให้ครั้งหน้า' : '✅ Customer saved! System will remember this data.');

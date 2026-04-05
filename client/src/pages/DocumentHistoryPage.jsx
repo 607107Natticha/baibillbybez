@@ -61,14 +61,7 @@ const DocumentHistoryPage = () => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          navigate('/login');
-          return;
-        }
-        const res = await axios.get(`${API_URL}/api/documents`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(`${API_URL}/api/documents`);
         setDocuments(res.data || []);
       } catch (error) {
         console.error('Error fetching documents:', error);
@@ -77,7 +70,7 @@ const DocumentHistoryPage = () => {
       }
     };
     fetchDocs();
-  }, [navigate]);
+  }, []);
 
   const statusOptions = useMemo(() => {
     const set = new Set();
@@ -156,10 +149,7 @@ const DocumentHistoryPage = () => {
     const { id } = deleteConfirm;
     setDeletingId(id);
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/documents/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(`${API_URL}/api/documents/${id}`);
       setDocuments((prev) => prev.filter((d) => d.id !== id));
       setDeleteConfirm(null);
     } catch (err) {

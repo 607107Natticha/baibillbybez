@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { UsersIcon, PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { t } from '../utils/translations';
 import { useLanguage } from '../context/LanguageContext';
@@ -8,7 +7,6 @@ import { useLanguage } from '../context/LanguageContext';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const CustomersPage = () => {
-  const navigate = useNavigate();
   const language = useLanguage();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,17 +22,12 @@ const CustomersPage = () => {
 
   const fetchCustomers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) { navigate('/login'); return; }
-
-      const res = await axios.get(`${API_URL}/api/customers`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(`${API_URL}/api/customers`);
       setCustomers(res.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching customers:', error);
-      if (error.response?.status === 401) navigate('/login');
+      setLoading(false);
     }
   };
 
@@ -47,16 +40,11 @@ const CustomersPage = () => {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
       if (editingCustomer) {
-        await axios.put(`${API_URL}/api/customers/${editingCustomer.id}`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.put(`${API_URL}/api/customers/${editingCustomer.id}`, formData);
         alert(language === 'th' ? 'แก้ไขข้อมูลสำเร็จ' : 'Updated successfully');
       } else {
-        await axios.post(`${API_URL}/api/customers`, formData, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.post(`${API_URL}/api/customers`, formData);
         alert(language === 'th' ? 'เพิ่มลูกค้าสำเร็จ' : 'Customer added successfully');
       }
       setShowModal(false);
@@ -87,10 +75,7 @@ const CustomersPage = () => {
     if (!confirm(language === 'th' ? 'ยืนยันการลบลูกค้า?' : 'Confirm delete customer?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/customers/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`${API_URL}/api/customers/${id}`);
       alert(language === 'th' ? 'ลบลูกค้าสำเร็จ' : 'Customer deleted successfully');
       fetchCustomers();
     } catch (error) {

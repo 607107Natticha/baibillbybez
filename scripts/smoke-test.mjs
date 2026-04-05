@@ -20,20 +20,14 @@ async function main() {
     throw new Error('GET / body did not look like SPA or dev API landing');
   }
 
-  const email = `smoke_${Date.now()}@sabaibill.local`;
-  const pin = '123456';
-  const regRes = await fetch(`${base}/api/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, pin, confirmPin: pin }),
-  });
-  if (!regRes.ok) {
-    const errBody = await regRes.text();
-    throw new Error(`POST /api/register expected 2xx, got ${regRes.status}: ${errBody}`);
+  const statusRes = await fetch(`${base}/api/onboarding-status`);
+  if (!statusRes.ok) {
+    const errBody = await statusRes.text();
+    throw new Error(`GET /api/onboarding-status expected 2xx, got ${statusRes.status}: ${errBody}`);
   }
-  const regJson = await regRes.json();
-  if (!regJson.token) {
-    throw new Error('POST /api/register missing token in JSON body');
+  const statusJson = await statusRes.json();
+  if (typeof statusJson.isOnboarded !== 'boolean') {
+    throw new Error('GET /api/onboarding-status missing isOnboarded boolean');
   }
 
   console.log(`Smoke OK against ${base} (mode: ${looksLikeSpa ? 'production SPA or similar' : 'dev API'})`);

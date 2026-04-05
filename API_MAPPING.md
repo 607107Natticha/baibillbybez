@@ -9,9 +9,7 @@ CORS ฝั่ง Backend: `process.env.FRONTEND_URL || 'http://localhost:5173'`
 
 | หน้า/คอมโพเนนต์ | Method | Endpoint | ใช้ทำอะไร |
 |-----------------|--------|----------|-----------|
-| **LoginPage** | POST | `/api/login` | เข้าสู่ระบบ (email, pin) → ได้ token, isOnboarded |
-| **RegisterPage** | POST | `/api/register` | สมัครสมาชิก → ได้ token แล้ว redirect ไป onboarding |
-| **GoogleSignIn** | POST | `/api/auth/google/verify` | ยืนยันโทเคน Google → ได้ token, isOnboarded |
+| **EntryPage** | GET | `/api/onboarding-status` | เช็ค `isOnboarded` แล้วไป `/onboarding` หรือ `/dashboard` (ไม่ใช้ token) |
 | **OnboardingPage** | POST | `/api/onboarding/complete` | บันทึกข้อมูลบริษัท/โลโก้หลัง onboard ครั้งแรก |
 | **DashboardPage** | GET | `/api/documents` | ดึงรายการเอกสาร |
 | **DashboardPage** | GET | `/api/settings` | ดึงชื่อบริษัทมาแสดงใน header |
@@ -35,9 +33,7 @@ CORS ฝั่ง Backend: `process.env.FRONTEND_URL || 'http://localhost:5173'`
 
 ## Endpoint ใน Backend ที่ Frontend ยังไม่เรียก
 
-| Method | Endpoint | หมายเหตุ |
-|--------|----------|----------|
-| GET | `/api/onboarding-status` | Backend มีไว้เช็คสถานะ onboarding; Frontend ใช้ค่า `isOnboarded` จาก response ของ login / google verify แทน |
+(ไม่มีรายการจากตารางหลัก — ปรับ mapping เมื่อเพิ่มหน้าใหม่)
 
 ---
 
@@ -45,10 +41,10 @@ CORS ฝั่ง Backend: `process.env.FRONTEND_URL || 'http://localhost:5173'`
 
 - **Settings**: Frontend ส่ง/รับ `companyName`, `companyNameEn`, `address`, `addressEn`, `country`, `postalCode`, `taxId`, `phone`, `logoImage`, `templateTheme`, `templateLayout`, `fontFamily`, ข้อมูลธนาคาร (`bankName`, `customBankName`, `customBankLogo`, `bankAccountName`, `bankAccountNumber`), ข้อความเงื่อนไข (`condQT`, `condSO`, `condDO`, `condIV`) — ควรตรงกับที่ Backend (Prisma/settingsController) บันทึกและส่งคืน
 - **Documents**: รูปแบบเอกสาร (type, no, date, items, customer, total, status ฯลฯ) ต้องตรงกับที่ documentController และ documentRoutes ใช้
-- **Auth**: Response ต้องมี `token` และ (ถ้ามี) `isOnboarded` เพื่อให้ LoginPage / GoogleSignIn redirect ถูก
+- **Auth / ผู้ใช้**: ฝั่ง API ใช้ `singletonUserMiddleware` — สร้าง/เลือกผู้ใช้คนเดียวใน DB แล้วตั้ง `req.userId` โดยไม่ต้องส่ง `Authorization` จากเบราว์เซอร์ (เหมาะ demo ส่วนตัวเท่านั้น)
 
 ---
 
 ## การเชื่อมกันโดยรวม
 
-Frontend กับ Backend ทำงานร่วมกันผ่านชุด endpoint ด้านบน โดย Frontend ใช้ `axios` + `Authorization: Bearer <token>` สำหรับ route ที่ต้อง auth; Backend ใช้ `authMiddleware` กับ route ที่ต้องการ login และส่ง CORS อนุญาตจาก `FRONTEND_URL`/`http://localhost:5173`
+Frontend กับ Backend ทำงานร่วมกันผ่านชุด endpoint ด้านบน โดย Frontend ใช้ `axios` โดยไม่แนบ Bearer token; Backend ใช้ `singletonUserMiddleware` บน route ที่เคยต้อง login และส่ง CORS อนุญาตจาก `FRONTEND_URL`/`http://localhost:5173`

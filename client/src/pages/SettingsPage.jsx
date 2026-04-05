@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { Cog6ToothIcon, CheckIcon, CreditCardIcon, DocumentTextIcon, PaintBrushIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import TemplatePreview from '../components/TemplatePreview';
 import SignaturePad from '../components/SignaturePad';
@@ -30,7 +29,6 @@ const getLayouts = (lang) => [
 ];
 
 const SettingsPage = () => {
-  const navigate = useNavigate();
   const language = useLanguage();
   const { displayCurrency, setDisplayCurrency, currencySettings } = useCurrency();
   const [loading, setLoading] = useState(false);
@@ -75,20 +73,14 @@ const SettingsPage = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) { navigate('/login'); return; }
-        
-        const res = await axios.get(`${API_URL}/api/settings`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_URL}/api/settings`);
         if (res.data) setSettings(res.data);
       } catch (error) {
         console.error('Error fetching settings:', error);
-        if (error.response?.status === 401) navigate('/login');
       }
     };
     fetchSettings();
-  }, [navigate]);
+  }, []);
 
   const handleImageUpload = (e, target) => {
     const file = e.target.files[0];
@@ -107,10 +99,7 @@ const SettingsPage = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.put(`${API_URL}/api/settings`, settings, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`${API_URL}/api/settings`, settings);
       alert(language === 'th' ? 'บันทึกข้อมูลเรียบร้อย' : 'Settings saved successfully');
     } catch (error) {
       alert((language === 'th' ? 'เกิดข้อผิดพลาด: ' : 'Error: ') + (error.response?.data?.message || error.message));
