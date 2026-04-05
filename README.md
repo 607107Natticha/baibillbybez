@@ -7,7 +7,7 @@
 
 **Clone โปรเจกต์:** `git clone https://github.com/607107Natticha/baibillbybez.git`
 - **ลำดับทดลอง:** เปิด URL → สมัครสมาชิก (email + PIN 6 หลัก) → กรอก onboarding ข้อมูลบริษัท → สร้างเอกสาร (QT/SO/DO/IV) → ลองพิมพ์หรือบันทึก PDF จากหน้า Preview
-- **ข้อมูลไม่ให้หายบน Render:** แผน **Free ใช้ Persistent Disk ไม่ได้** — ต้องอัปเป็นแผน **Starter+** แล้ว mount disk (โปรเจกต์ตั้งค่าไว้ใน [`render.yaml`](./render.yaml) ที่ `/data` + `DATABASE_URL=file:/data/dev.db`) มีค่าใช้จ่ายตาม [Render](https://render.com/pricing) — รายละเอียดใน [DEPLOY.md](./DEPLOY.md) หัวข้อ **4.1**  
+- **Render แบบ Free:** ครั้งแรกหลังเว็บหยุดไปนานอาจ **หน่วง ~1 นาที** (cold start) — ยอมรับได้สำหรับ demo; ข้อมูล SQLite อาจ **รีเซ็ต** เมื่อ redeploy ถ้าไม่ใช้ disk แบบมีค่าใช้จ่าย (ดู [DEPLOY.md](./DEPLOY.md) หัวข้อ **4.1** ถ้าอยากเก็บถาวร)  
 - **Google Login:** ใช้ได้เมื่อตั้งค่า OAuth ใน Google Cloud ให้ตรง **Authorized JavaScript origins** และ redirect ของ URL จริง — ถ้ายังไม่ตั้ง ให้ใช้การเข้าสู่ระบบด้วย email + PIN
 
 รายละเอียด deploy แบบโฮสต์เดียว / Render Blueprint — ดู [DEPLOY.md](./DEPLOY.md)
