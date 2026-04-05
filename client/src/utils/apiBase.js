@@ -1,25 +1,28 @@
 /**
  * Base URL for API calls (no trailing slash).
- * Production build ใส่ flag ใน index.html (vite plugin) → ใช้ origin เดียวกับหน้าเว็บ แม้มี VITE_API_URL เก่าใน bundle
- * Dev: default http://localhost:3001
- * แยกโดเมน: build ด้วย VITE_SINGLE_HOST_API=false และตั้ง VITE_API_URL
+ * Production ค่าเริ่มต้น: origin เดียวกับหน้าเว็บ — กันค่า VITE_API_URL เก่าที่ติดใน bundle (เช่น billbybz) จนเกิด CORS
+ * แยกโดเมน SPA/API: build ด้วย VITE_SINGLE_HOST_API=false และตั้ง VITE_API_URL + CORS บน backend
+ * Dev: ใช้ VITE_API_URL ถ้ามี ไม่มีใช้ http://localhost:3001
  */
 export function getApiBase() {
   const raw = import.meta.env.VITE_API_URL;
-
-  if (
-    import.meta.env.PROD &&
-    typeof window !== 'undefined' &&
-    window.__SABAIBILL_USE_PAGE_ORIGIN_FOR_API__ === true &&
-    window.location?.origin
-  ) {
-    return window.location.origin;
-  }
-
-  const forceSameEnv =
+  const splitHosts =
+    String(import.meta.env.VITE_SINGLE_HOST_API || '').toLowerCase() === 'false';
+  const forceSame =
     import.meta.env.PROD &&
     String(import.meta.env.VITE_SAME_ORIGIN_API || '').toLowerCase() === 'true';
-  if (forceSameEnv && typeof window !== 'undefined' && window.location?.origin) {
+
+  if (forceSame && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  if (splitHosts) {
+    const trimmed = raw != null ? String(raw).trim() : '';
+    if (trimmed !== '') return trimmed.replace(/\/$/, '');
+  } else if (
+    import.meta.env.PROD &&
+    typeof window !== 'undefined' &&
+    window.location?.origin
+  ) {
     return window.location.origin;
   }
 
