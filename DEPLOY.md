@@ -83,9 +83,10 @@ pm2 start src/server.js --name sabaibill
 โปรเจกต์มีไฟล์ [`render.yaml`](./render.yaml) สำหรับสร้าง Web service ตัวเดียว (build ทั้ง root + `client/` แล้ว `npm start`)
 
 1. Push โค้ดขึ้น GitHub แล้วใน Render เลือก **New → Blueprint** ชี้ repo นี้
-2. ใน Render ตั้ง **Build-time environment variable** `VITE_API_URL` = `https://<ชื่อ-service>.onrender.com` (หรือโดเมนของคุณ) แล้ว **Deploy ใหม่** หนึ่งครั้ง เพื่อให้ bundle ของ Vite ชี้ API ถูกต้อง
-3. ตรวจสอบว่า `JWT_SECRET` ถูกตั้งแล้ว (Blueprint สร้างค่าสุ่มได้ — ดูในแท็บ Environment)
-4. (ทางเลือก) Mount **Persistent Disk** แล้วตั้ง `DATABASE_URL=file:/path/on/disk/dev.db` ตาม path ที่ Render กำหนด
+2. **ถ้า build ล้มด้วย exit 127 ตอน `vite build`:** สาเหตุมักเป็นเพราะ `NODE_ENV=production` ทำให้ `npm ci` ไม่ลง devDependencies (รวม **Vite**) — ใช้ Build command แบบใน [`render.yaml`](./render.yaml) ที่ขึ้นต้นด้วย `NPM_CONFIG_PRODUCTION=false` หรือรัน `npm ci --include=dev` แทน
+3. ใน Render ตั้ง **Build-time environment variable** `VITE_API_URL` = `https://<ชื่อ-service>.onrender.com` (หรือโดเมนของคุณ) แล้ว **Deploy ใหม่** หนึ่งครั้ง เพื่อให้ bundle ของ Vite ชี้ API ถูกต้อง
+4. ตรวจสอบว่า `JWT_SECRET` ถูกตั้งแล้ว (Blueprint สร้างค่าสุ่มได้ — ดูในแท็บ Environment)
+5. (ทางเลือก) Mount **Persistent Disk** แล้วตั้ง `DATABASE_URL=file:/path/on/disk/dev.db` ตาม path ที่ Render กำหนด
 
 ทดสอบหลัง deploy:
 

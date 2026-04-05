@@ -14,7 +14,8 @@ services:
     name: sabai-bill
     runtime: node
     plan: free
-    buildCommand: npm ci && npm ci --prefix client && npm run build:client && npx prisma generate
+    # NODE_ENV=production makes npm ci skip devDependencies; Vite must be installed to build.
+    buildCommand: NPM_CONFIG_PRODUCTION=false npm ci && NPM_CONFIG_PRODUCTION=false npm ci --prefix client && npm run build:client && npx prisma generate
     startCommand: npx prisma db push && npm start
     envVars:
       - key: NODE_ENV
