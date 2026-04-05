@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const customerController = require('../controllers/customerController');
-const authMiddleware = require('../middleware/authMiddleware');
+const singletonUserMiddleware = require('../middleware/singletonUserMiddleware');
 
 // All routes require authentication
-router.use(authMiddleware);
+router.use(singletonUserMiddleware);
 
 router.get('/customers', customerController.getCustomers);
 router.get('/customers/:id', customerController.getCustomerById);
