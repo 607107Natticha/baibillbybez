@@ -233,7 +233,9 @@ VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
 แนวทาง: build หน้าเว็บแล้วให้ Express เสิร์ฟ `client/dist` พร้อม API ที่ `/api`
 
 1. ตั้ง `NODE_ENV=production` และ `DATABASE_URL` ใน `.env` ที่ root  
-2. ตั้ง **`VITE_API_URL`** ให้ตรง URL สาธารณะที่ผู้ใช้เปิดแอป แล้วรัน:
+2. **แนะนำ:** อย่าตั้ง `VITE_API_URL` ตอน build (หรือเว้นว่าง) — แอปจะเรียก API ที่ **origin เดียวกับหน้าเว็บ** จึงไม่โดน CORS  
+   ถ้าจำเป็นต้องชี้ API คนละโดเมน ค่อยตั้ง `VITE_API_URL` แล้วบน backend ต้องตั้ง `FRONTEND_URL` หรือ `CORS_ALLOWED_ORIGINS` ให้ตรงโดเมนหน้าเว็บ  
+3. รัน:
 
    ```bash
    cd client
@@ -244,7 +246,7 @@ VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
    npm start
    ```
 
-**Render:** ใช้ไฟล์ [`render.yaml`](./render.yaml) เป็น Blueprint ได้ — ตั้ง **`VITE_API_URL`** ใน Build environment เป็น URL ของ service (เช่น `https://ชื่อ.onrender.com`) แล้ว deploy ใหม่หนึ่งครั้ง
+**Render:** ใช้ไฟล์ [`render.yaml`](./render.yaml) เป็น Blueprint ได้ — **ถ้าเป็น service เดียว** ลบหรือไม่ตั้ง `VITE_API_URL` ตอน build แล้ว deploy ใหม่ จะใช้ same-origin อัตโนมัติ ถ้ายังแยกสอง service ให้ตั้ง `VITE_API_URL` ที่ build และบน API ใส่ `FRONTEND_URL=https://โดเมนหน้าเว็บ`
 
 **ข้อมูลไม่หายหลัง redeploy:** บน Render แผนฟรีดิสก์มักไม่ถาวร — ถ้าต้องการ SQLite คงอยู่ ต้องใช้แผนมีค่าใช้จ่าย + Persistent Disk และตั้ง `DATABASE_URL` ชี้ path บนดิสก์ (ดูเอกสาร Render เรื่อง Disks)
 
@@ -257,16 +259,18 @@ VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
 | `DATABASE_URL` | Prisma | SQLite เช่น `file:./dev.db` |
 | `PORT` | Backend | พอร์ตเซิร์ฟเวอร์ (ค่าเริ่มต้น 3001) |
 | `NODE_ENV` | Backend | ใส่ `production` เพื่อเสิร์ฟ SPA จาก `client/dist` |
-| `FRONTEND_URL` | Backend | CORS — คั่นหลาย origin ด้วย comma ได้ |
-| `VITE_API_URL` | ตอน build client | ที่อยู่ API สำหรับเรียก `/api/...` |
+| `FRONTEND_URL` | Backend | CORS — origin ของหน้าเว็บ คั่นหลายตัวด้วย comma |
+| `CORS_ALLOWED_ORIGINS` | Backend | เพิ่ม origin ที่อนุญาต (คั่นด้วย comma) ใช้คู่กับ `FRONTEND_URL` เมื่อมีหลายหน้าเว็บ |
+| `VITE_API_URL` | ตอน build client | ถ้าไม่ตั้ง = production ใช้ origin เดียวกับหน้าเว็บ; ตั้งเมื่อ API คนละโดเมน |
 | `JWT_SECRET` | Backend | ค่าใน `.env.example` (โค้ดเดิมรองรับ JWT; flow ปัจจุบันไม่บังคับส่ง token จากเบราว์เซอร์) |
 
 ---
 
 ## แก้ปัญหาที่พบบ่อย
 
+- **CORS / `No 'Access-Control-Allow-Origin'`** — หน้าเว็บกับ API คนละโดเมน: บนเซิร์ฟเวอร์ API ตั้ง `FRONTEND_URL` หรือ `CORS_ALLOWED_ORIGINS` ให้เป็น URL หน้าเว็บจริง (เช่น `https://baibillbybez.onrender.com`) แล้ว redeploy หรือเปลี่ยนมา **โฮสต์เดียว** และ build โดยไม่ตั้ง `VITE_API_URL`  
 - **500 ตอนบันทึก** — รัน `npx prisma db push` และตรวจว่า Backend รันอยู่  
-- **Frontend เรียก API ไม่ถึง** — ตรวจ `VITE_API_URL` ให้ตรงพอร์ตจริงของ Backend  
+- **Frontend เรียก API ไม่ถึง** — dev: ตั้ง `VITE_API_URL` ให้ตรงพอร์ต Backend  
 - **โลโก้** — วาง `client/public/logo.png` แล้วรีเฟรชหน้าเว็บ
 
 ---

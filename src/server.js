@@ -13,13 +13,31 @@ const productRoutes = require('./routes/productRoutes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware — รองรับ frontend ที่ 5174 (หลัก) และ 5173
-const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(s => s.trim())
-  : ['http://localhost:5174', 'http://localhost:5173'];
+function parseOriginList(...sources) {
+  const out = [];
+  for (const s of sources) {
+    if (!s || typeof s !== 'string') continue;
+    for (const part of s.split(',')) {
+      const t = part.trim();
+      if (t && !out.includes(t)) out.push(t);
+    }
+  }
+  return out;
+}
+
+// CORS: FRONTEND_URL และ/หรือ CORS_ALLOWED_ORIGINS (คั่นด้วย comma) — ใช้เมื่อ SPA คนละโดเมนกับ API
+const allowedOrigins = parseOriginList(
+  process.env.FRONTEND_URL,
+  process.env.CORS_ALLOWED_ORIGINS
+);
+const corsOrigins =
+  allowedOrigins.length > 0
+    ? allowedOrigins
+    : ['http://localhost:5174', 'http://localhost:5173'];
+
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) cb(null, origin || allowedOrigins[0]);
+    if (!origin || corsOrigins.includes(origin)) cb(null, origin || corsOrigins[0]);
     else cb(null, false);
   },
   credentials: true

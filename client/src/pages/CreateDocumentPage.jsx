@@ -6,7 +6,9 @@ import { t, getDocTypeName } from '../utils/translations';
 import { useLanguage } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { getApiBase } from '../utils/apiBase';
+
+const API_URL = getApiBase();
 const DRAFT_KEY = 'sabaibill_createDocument_draft';
 const ITEM_TEMPLATES_KEY = 'sabaibill_item_templates';
 

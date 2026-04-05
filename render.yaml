@@ -4,9 +4,8 @@
 # Free tier: cold start can take ~1 min when idle; SQLite on ephemeral disk may reset on redeploy.
 # For persistent DB on Render you need a paid plan + disk — see README.md (Deploy section).
 #
-# Before first successful client build, set in the Render dashboard (Build environment):
-#   VITE_API_URL = https://<your-service-name>.onrender.com
-# Then trigger a new deploy so the SPA calls the correct API origin.
+# Build: ไม่ต้องตั้ง VITE_API_URL ถ้า API กับ SPA อยู่ service เดียวกัน (แอปใช้ window.location.origin → ไม่โดน CORS)
+# ถ้าแยก API คนละ service: ตั้ง VITE_API_URL ที่ Build env และบน API ตั้ง FRONTEND_URL / CORS_ALLOWED_ORIGINS = URL หน้าเว็บ
 
 services:
   - type: web

@@ -6,8 +6,9 @@ import SignaturePad from '../components/SignaturePad';
 import { t } from '../utils/translations';
 import { useLanguage } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { getApiBase } from '../utils/apiBase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = getApiBase();
 
 // Theme Configuration
 const getThemes = (lang) => [

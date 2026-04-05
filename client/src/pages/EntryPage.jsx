@@ -2,8 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Loader2 } from 'lucide-react';
+import { getApiBase } from '../utils/apiBase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = getApiBase();
 
 export default function EntryPage() {
   const navigate = useNavigate();

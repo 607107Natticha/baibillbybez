@@ -3,8 +3,9 @@ import axios from 'axios';
 import { UsersIcon, PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { t } from '../utils/translations';
 import { useLanguage } from '../context/LanguageContext';
+import { getApiBase } from '../utils/apiBase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = getApiBase();
 
 const CustomersPage = () => {
   const language = useLanguage();

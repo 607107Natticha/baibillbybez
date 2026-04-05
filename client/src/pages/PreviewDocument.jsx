@@ -9,7 +9,9 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { THEME_COLORS } from '../styles/theme';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { getApiBase } from '../utils/apiBase';
+
+const API_URL = getApiBase();
 
 const PreviewDocument = () => {
   const { id } = useParams();

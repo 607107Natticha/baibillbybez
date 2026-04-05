@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Building, ImageIcon, MapPin, Phone, CreditCard, ChevronRight, ChevronLeft, Check, Upload, Globe, Mail } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { getApiBase } from '../utils/apiBase';
+
+const API_URL = getApiBase();
 
 const COUNTRIES = [
   { code: 'TH', name: 'ไทย', postalLength: 5 },

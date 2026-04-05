@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { getApiBase } from '../utils/apiBase';
 
 const CURRENCY_DISPLAY_KEY = 'sabaibill_currency_display';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = getApiBase();
 const PROTECTED_PATHS = ['/dashboard', '/history', '/customers', '/settings', '/create-document', '/documents', '/onboarding'];
 
 const CurrencyContext = createContext({

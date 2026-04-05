@@ -7,7 +7,9 @@ import { getDocTypeName, t } from '../utils/translations';
 import { useLanguage } from '../context/LanguageContext';
 import { useCurrency } from '../context/CurrencyContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { getApiBase } from '../utils/apiBase';
+
+const API_URL = getApiBase();
 
 const TYPE_ORDER = ['QT', 'SO', 'DO', 'IV'];
 
