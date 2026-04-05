@@ -1,233 +1,284 @@
-# SabaiBill — ระบบออกเอกสารใบเสนอราคา/ใบสั่งขาย/ใบส่งของ/ใบแจ้งหนี้
+# SabaiBill
 
-## Live demo / กรรมการ
-
-- **URL ทดลอง:** [https://baibillbybez.onrender.com](https://baibillbybez.onrender.com)
-- **ที่เก็บโค้ด (GitHub):** [github.com/607107Natticha/baibillbybez](https://github.com/607107Natticha/baibillbybez)
-
-**Clone โปรเจกต์:** `git clone https://github.com/607107Natticha/baibillbybez.git`
-- **ลำดับทดลอง:** เปิด URL → กด **เข้าใช้งาน** → ถ้ายังไม่กรอกข้อมูลบริษัทจะไปหน้า onboarding → จากนั้นสร้างเอกสาร (QT/SO/DO/IV) → ลองพิมพ์หรือบันทึก PDF จากหน้า Preview  
-- **Render แบบ Free:** ครั้งแรกหลังเว็บหยุดไปนานอาจ **หน่วง ~1 นาที** (cold start) — ยอมรับได้สำหรับ demo; ข้อมูล SQLite อาจ **รีเซ็ต** เมื่อ redeploy ถ้าไม่ใช้ disk แบบมีค่าใช้จ่าย (ดู [DEPLOY.md](./DEPLOY.md) หัวข้อ **4.1** ถ้าอยากเก็บถาวร)  
-- **ไม่มีระบบล็อกอินแยกผู้ใช้:** demo ใช้ผู้ใช้คนเดียวในระบบ (API ไม่ต้องส่ง token) — เหมาะกับการทดลองส่วนตัว ไม่ควรเปิดเป็นข้อมูลลับโดยไม่มีชั้นป้องกันอื่น
-
-รายละเอียด deploy แบบโฮสต์เดียว / Render Blueprint — ดู [DEPLOY.md](./DEPLOY.md)
-
-**ตรวจสอบหลัง deploy (กรรมการ / smoke):**
-
-```bash
-SMOKE_BASE_URL=https://your-demo.example.com npm run smoke
-```
-
-จากนั้นเปิด URL ในเบราว์เซอร์ — ลองครบ flow: เข้าใช้งาน → onboarding (ถ้ายังไม่เคย) → สร้างเอกสาร → หน้า Preview → พิมพ์หรือบันทึก PDF
+**SabaiBill** เป็นเว็บแอปสำหรับธุรกิจขนาดเล็กที่ต้องการออกเอกสารซื้อขายครบวงจรในที่เดียว — ตั้งแต่ใบเสนอราคาไปจนถึงใบแจ้งหนี้ พร้อมตั้งค่าบริษัท เทมเพลต พิมพ์ และบันทึก PDF
 
 ---
 
-## 🚀 การติดตั้งและรันระบบ
+## สำหรับกรรมการ (สรุปสั้น ๆ)
 
-### 1. ติดตั้ง Dependencies
+| รายการ | ลิงก์ / คำอธิบาย |
+|--------|-------------------|
+| **ทดลองออนไลน์** | [https://baibillbybez.onrender.com](https://baibillbybez.onrender.com) |
+| **ซอร์สโค้ด** | [github.com/607107Natticha/baibillbybez](https://github.com/607107Natticha/baibillbybez) |
+| **ลำดับทดลอง** | เปิด URL → กด **เข้าใช้งาน** → กรอกข้อมูลบริษัท (ครั้งแรก) → สร้างเอกสาร → เปิด Preview → พิมพ์หรือ Save PDF |
+| **หมายเหตุ demo** | โฮสต์แบบฟรีอาจ **หน่วง ~1 นาที** ครั้งแรกหลังไม่มีคนใช้นาน (cold start) และข้อมูล SQLite อาจ **หายเมื่อ redeploy** ถ้าไม่ใช้ดิสก์ถาวร |
+
+**ตรวจ API หลัง deploy (ไม่ต้องเปิดเบราว์เซอร์):**
 
 ```bash
-# ในโฟลเดอร์ root (f:\sabaibill)
+git clone https://github.com/607107Natticha/baibillbybez.git
+cd baibillbybez
 npm install
-
-# ในโฟลเดอร์ client
-cd client
-npm install
-
-# ในโฟลเดอร์ root อีกครั้งสำหรับ backend
-cd ..
-npm install
+SMOKE_BASE_URL=https://baibillbybez.onrender.com npm run smoke
 ```
-
-### 2. ตั้งค่าฐานข้อมูล
-
-สำเนาไฟล์ environment แล้วแก้ค่าที่จำเป็น (ถ้ายังไม่มี `DATABASE_URL` ให้คัดลอกจากตัวอย่าง; `JWT_SECRET` ยังเก็บไว้ใน `.env.example` เพื่อความเข้ากันได้กับโค้ดเดิม แต่ flow ปัจจุบันไม่บังคับใช้):
-
-```bash
-# ในโฟลเดอร์ root — ถ้ายังไม่มี .env
-cp .env.example .env
-# Windows (cmd): copy .env.example .env
-# จากนั้นยืนยัน DATABASE_URL (ค่าเริ่มต้น SQLite อยู่ที่ prisma/dev.db)
-```
-
-```bash
-# ในโฟลเดอร์ root
-npx prisma generate
-npx prisma db push
-```
-
-### 3. รัน Backend Server
-
-```bash
-# ในโฟลเดอร์ root (f:\sabaibill)
-node src/server.js
-```
-
-- Backend จะทำงานที่ **http://localhost:3001**
-- ดู log ใน terminal ได้เลย (มี Prisma query log)
-
-### 4. รัน Frontend Dev Server
-
-**เปิด terminal ใหม่** แล้วรัน:
-
-```bash
-# ในโฟลเดอร์ client
-cd client
-npm run dev
-# หรือ
-npx vite
-```
-
-- Frontend จะทำงานที่ **http://localhost:5173**
-- รอจนขึ้น `Local: http://localhost:5173/`
 
 ---
 
-## 📋 การใช้งานครั้งแรก
+## โปรเจกต์นี้คืออะไร
 
-1. **เปิดเบราว์เซอร์** ไปที่ http://localhost:5173
-2. **กดเข้าใช้งาน** — ระบบจะพาไปหน้า onboarding ถ้ายังไม่กรอกข้อมูลบริษัท หรือไปแดชบอร์ดถ้าทำแล้ว
-3. **Onboarding** — กรอกข้อมูลบริษัท (จำเป็นต้องกรอกให้ครบ)
-4. **เริ่มสร้างเอกสาร** ได้ทันที
+SabaiBill ช่วยให้ผู้ใช้:
 
-**คู่มือการใช้งานทั้งหมด (รวมถึงตั้งค่าสกุลเงิน, หัก ณ ที่จ่าย, พิมพ์/PDF, สลับสกุลเงิน)** — ดูใน [DEPLOY.md](./DEPLOY.md#ขั้นตอนการใช้งานทั้งหมดคู่มือผู้ใช้)
+- สร้างและจัดเก็บเอกสาร **QT** (ใบเสนอราคา), **SO** (ใบสั่งขาย), **DO** (ใบส่งของ), **IV** (ใบแจ้งหนี้)
+- **แปลงต่อเนื่อง** เช่น QT → SO → DO / IV
+- ตั้งค่า **ข้อมูลบริษัท ธนาคาร เงื่อนไขท้ายบิล เทมเพลต ลายเซ็น QR ชำระเงิน สกุลเงิน**
+- คำนวณ **VAT ส่วนลด หัก ณ ที่จ่าย (WHT)** และแสดงยอดสุทธิ
+- **พิมพ์ / บันทึก PDF** จากหน้า Preview
+- จัดการ **ลูกค้าและสินค้า** พร้อมค้นหาแบบ autocomplete
 
----
-
-## 🚀 การ Deploy สำหรับทดลองใช้
-
-วิธีนำแอปขึ้น production (โฮสต์เดียว หรือแยก Frontend/Backend) และขั้นตอนการใช้งานครบ — ดู **[DEPLOY.md](./DEPLOY.md)**
+**การเข้าใช้งาน:** ไม่มีหน้าสมัครหรือล็อกอินแยก — กดปุ่มเดียวแล้วระบบใช้ผู้ใช้คนเดียวในฐานข้อมูล (เหมาะกับ **demo / ทดลองภายใน** ไม่เหมาะกับข้อมูลลับโดยไม่มีชั้นป้องกันอื่น)
 
 ---
 
-## 🛠 หมายเหตุสำคัญ
+## ภาษาและประสบการณ์ผู้ใช้
 
-- **ต้องรันทั้ง Backend และ Frontend พร้อมกัน**
-- **Backend** ใช้ `node src/server.js` (อย่าใช้ `node index.js`)
-- **Frontend** ใช้ `npm run dev` หรือ `npx vite`
-- **Database** เป็น SQLite ไฟล์ `prisma/dev.db` เมื่อใช้ `DATABASE_URL="file:./dev.db"` ใน `.env`
-- **Port**:
-  - Backend: `3001`
-  - Frontend: `5173`
+- **ภาษาอินเทอร์เฟซ:** ไทยและอังกฤษ (สลับได้ในแอป)
+- **ข้อความในเอกสาร:** รองรับฟิลด์คู่ไทย/อังกฤษ (ชื่อบริษัท ที่อยู่ ลูกค้า ฯลฯ)
+- **ออกแบบให้อ่านง่าย:** ตัวอักษรโต ปุ่มกดใหญ่ เหมาะผู้ใช้ที่ต้องการความชัดเจน
 
 ---
 
-## 🧩 ฟีเจอร์หลัก
+## Tech Stack
 
-- ✅ สร้างเอกสาร 4 ประเภท (QT, SO, DO, IV)
-- ✅ แปลงเอกสารต่อเนื่อง (QT → SO → DO/IV)
-- ✅ รองรับทั้งภาษาไทยและอังกฤษ
-- ✅ แสดงราคา/ซ่อนราคา (สำหรับ DO)
-- ✅ ส่วนลด % และ ฿
-- ✅ คำนวณ VAT 7% อัตโนมัติ
-- ✅ ภาษีหัก ณ ที่จ่าย (WHT) และยอดสุทธิที่ลูกค้าจ่าย (Net Payable)
-- ✅ ตั้งค่าสกุลเงินและปุ่มสลับสกุลเงิน (THB / USD ฯลฯ)
-- ✅ ลายเซ็นผู้จัดทำ
-- ✅ ข้อมูลการชำระเงิน (IV)
-- ✅ อัปเดตสถานะเอกสาร
-- ✅ พิมพ์เอกสาร (Classic/Modern/Minimal layout)
-- ✅ บันทึกข้อมูลลูกค้าและสินค้าอัตโนมัติ
-- ✅ ค้นหาลูกค้า/สินค้าแบบ autocomplete
-- ✅ รองรับผู้ใช้งานวัย senior (font 16px, touch targets ใหญ่)
+| ชั้น | เทคโนโลยี |
+|-----|-----------|
+| **Frontend** | React 19, Vite, React Router, Tailwind CSS, Axios, Heroicons / Lucide |
+| **Backend** | Node.js, Express |
+| **ฐานข้อมูล** | SQLite + **Prisma ORM** |
+| **เอกสาร / พิมพ์** | html2pdf.js, jsPDF, html2canvas (ในหน้า Preview) |
+
+ภาษาโปรแกรมหลัก: **JavaScript (ES modules ฝั่ง client)** และ **CommonJS ฝั่ง server** — สคีมาฐานข้อมูลนิยามใน **Prisma Schema**
 
 ---
 
-## 📁 โครงสร้างโฟลเดอร์
+## โครงสร้างโปรเจกต์ (ย่อ)
 
 ```
 sabaibill/
-├── src/                 # Backend (Node.js + Express + Prisma)
+├── src/                 # Backend (Express)
 │   ├── controllers/
-│   ├── middleware/
+│   ├── middleware/      # เช่น singletonUserMiddleware
 │   ├── routes/
-│   ├── prisma.js
 │   └── server.js
-├── client/              # Frontend (React + Vite)
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   └── utils/
-│   └── package.json
+├── client/              # Frontend (Vite + React)
+│   └── src/
+│       ├── pages/
+│       ├── components/
+│       └── context/
 ├── prisma/
-│   ├── schema.prisma    # Database schema
-│   └── dev.db           # SQLite (สร้างหลัง db push — ไม่ commit)
+│   ├── schema.prisma
+│   └── dev.db           # สร้างหลัง db push (ไม่ควร commit)
+├── scripts/smoke-test.mjs
 ├── render.yaml          # ตัวอย่าง Blueprint สำหรับ Render
 └── README.md
 ```
 
 ---
 
-## 🔧 การแก้ไขปัญหาที่พบบ่อย
+## ตัวอย่างโค้ดสำคัญ
 
-### 500 Error ตอนบันทึกเอกสาร
-- ตรวจสอบว่ารัน `npx prisma db push` แล้ว
-- ตรวจสอบว่า backend และ frontend รันพร้อมกัน
-- ดู log ใน terminal ของ backend
+### 1) เข้าใช้งานจากหน้าแรก — เช็ค onboarding แล้วส่งต่อ route
 
-### Frontend ไม่โหลด
-- ตรวจสอบว่า backend รันที่ port 3001
-- ลอง hard refresh (Ctrl+Shift+R)
-- ตรวจสอบว่า `VITE_API_URL=http://localhost:3001` ใน `client/.env`
+```jsx
+// client/src/pages/EntryPage.jsx (แนวคิดหลัก)
+const handleEnter = async () => {
+  setLoading(true);
+  try {
+    const { data } = await axios.get(`${API_URL}/api/onboarding-status`);
+    navigate(data.isOnboarded ? '/dashboard' : '/onboarding', { replace: true });
+  } catch {
+    navigate('/onboarding', { replace: true });
+  } finally {
+    setLoading(false);
+  }
+};
+```
 
-### Database ไม่ sync
+### 2) Middleware ผู้ใช้คนเดียว (ไม่ใช้ JWT ในเบราว์เซอร์)
+
+```javascript
+// src/middleware/singletonUserMiddleware.js
+module.exports = async function singletonUserMiddleware(req, res, next) {
+  try {
+    let user = await prisma.user.findFirst({ orderBy: { id: 'asc' } });
+    if (!user) {
+      user = await prisma.user.create({ data: { isOnboarded: false } });
+    }
+    req.userId = user.id;
+    req.user = { userId: user.id, email: user.email, isOnboarded: user.isOnboarded };
+    next();
+  } catch (err) {
+    console.error('singletonUserMiddleware:', err);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในระบบ' });
+  }
+};
+```
+
+### 3) Production: API + เสิร์ฟหน้าเว็บจากโฟลเดอร์เดียว
+
+```javascript
+// src/server.js — โหมด production
+if (process.env.NODE_ENV === 'production') {
+  const clientDist = path.join(__dirname, '..', 'client', 'dist');
+  app.use(express.static(clientDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientDist, 'index.html'), (err) => { if (err) next(err); });
+  });
+}
+```
+
+### 4) โมเดลหลักใน Prisma (ตัวอย่าง)
+
+```prisma
+// prisma/schema.prisma (ย่อ)
+model User {
+  id          Int     @id @default(autoincrement())
+  isOnboarded Boolean @default(false)
+  // ฟิลด์ email / OAuth เหลือเพื่อความเข้ากันได้กับโค้ดเดิม
+}
+
+model Document {
+  id     Int    @id @default(autoincrement())
+  type   String // QT, SO, DO, IV
+  no     String @unique
+  items  DocumentItem[]
+  // ยอดเงิน VAT ส่วนลด WHT ฯลฯ
+}
+```
+
+---
+
+## วิธีรันบนเครื่องตัวเอง
+
+### 1. ติดตั้งแพ็กเกจ
+
 ```bash
+npm install
+cd client && npm install && cd ..
+```
+
+### 2. ตั้งค่า `.env` ที่ root
+
+```bash
+# macOS / Linux
+cp .env.example .env
+
+# Windows (PowerShell)
+Copy-Item .env.example .env
+```
+
+ตรวจว่า `DATABASE_URL` ชี้ SQLite ตามที่ต้องการ (ค่าเริ่มต้นมักเป็น `file:./dev.db` ภายใต้โฟลเดอร์ `prisma/`)
+
+### 3. สร้างตารางในฐานข้อมูล
+
+```bash
+npx prisma generate
 npx prisma db push
 ```
 
+### 4. เปิด Backend และ Frontend (สองเทอร์มินัล)
+
+**เทอร์มินัล 1 — Backend**
+
+```bash
+node src/server.js
+# หรือ: npm run dev
+```
+
+เปิดที่ `http://localhost:3001` (ถ้าพอร์ตถูกใช้ ระบบอาจเลื่อนเป็น 3002, 3003)
+
+**เทอร์มินัล 2 — Frontend**
+
+```bash
+cd client
+npm run dev
+```
+
+เปิดที่ `http://localhost:5173` (หรือพอร์ตที่ Vite แจ้ง)
+
+ถ้า Backend ไม่ได้อยู่ที่ `3001` ให้สร้าง `client/.env`:
+
+```env
+VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
+```
+
+แล้วรัน `npm run dev` ใหม่ใน `client/`
+
 ---
 
-## 📝 License
+## คู่มือใช้งานแบบละเอียด (หลังเข้าแอปแล้ว)
+
+1. **หน้าแรก** → กด **เข้าใช้งาน**
+2. **Onboarding** — กรอกข้อมูลบริษัทครั้งแรก (ถ้ายังไม่เคย)
+3. **Settings** — บริษัท, ธนาคาร, เงื่อนไขท้ายบิล, เทมเพลต, ลายเซ็น, QR, **สกุลเงิน**
+4. **สร้างเอกสาร** — เลือก QT / SO / DO / IV, ลูกค้า, รายการ, ส่วนลด, VAT, WHT
+5. **ประวัติ** — ดู แปลงประเภท อัปเดตสถานะ
+6. **Preview** — พิมพ์หรือบันทึก PDF
+7. **สลับสกุลเงิน** — จากแถบเมนู (ถ้าตั้งค่าไว้)
+
+---
+
+## Deploy แบบโฮสต์เดียว (สรุป)
+
+แนวทาง: build หน้าเว็บแล้วให้ Express เสิร์ฟ `client/dist` พร้อม API ที่ `/api`
+
+1. ตั้ง `NODE_ENV=production` และ `DATABASE_URL` ใน `.env` ที่ root  
+2. ตั้ง **`VITE_API_URL`** ให้ตรง URL สาธารณะที่ผู้ใช้เปิดแอป แล้วรัน:
+
+   ```bash
+   cd client
+   npm run build
+   cd ..
+   npx prisma generate
+   npx prisma db push
+   npm start
+   ```
+
+**Render:** ใช้ไฟล์ [`render.yaml`](./render.yaml) เป็น Blueprint ได้ — ตั้ง **`VITE_API_URL`** ใน Build environment เป็น URL ของ service (เช่น `https://ชื่อ.onrender.com`) แล้ว deploy ใหม่หนึ่งครั้ง
+
+**ข้อมูลไม่หายหลัง redeploy:** บน Render แผนฟรีดิสก์มักไม่ถาวร — ถ้าต้องการ SQLite คงอยู่ ต้องใช้แผนมีค่าใช้จ่าย + Persistent Disk และตั้ง `DATABASE_URL` ชี้ path บนดิสก์ (ดูเอกสาร Render เรื่อง Disks)
+
+---
+
+## ตัวแปรสภาพแวดล้อมหลัก
+
+| ตัวแปร | ใช้ที่ไหน | ความหมายสั้น ๆ |
+|--------|-----------|----------------|
+| `DATABASE_URL` | Prisma | SQLite เช่น `file:./dev.db` |
+| `PORT` | Backend | พอร์ตเซิร์ฟเวอร์ (ค่าเริ่มต้น 3001) |
+| `NODE_ENV` | Backend | ใส่ `production` เพื่อเสิร์ฟ SPA จาก `client/dist` |
+| `FRONTEND_URL` | Backend | CORS — คั่นหลาย origin ด้วย comma ได้ |
+| `VITE_API_URL` | ตอน build client | ที่อยู่ API สำหรับเรียก `/api/...` |
+| `JWT_SECRET` | Backend | ค่าใน `.env.example` (โค้ดเดิมรองรับ JWT; flow ปัจจุบันไม่บังคับส่ง token จากเบราว์เซอร์) |
+
+---
+
+## แก้ปัญหาที่พบบ่อย
+
+- **500 ตอนบันทึก** — รัน `npx prisma db push` และตรวจว่า Backend รันอยู่  
+- **Frontend เรียก API ไม่ถึง** — ตรวจ `VITE_API_URL` ให้ตรงพอร์ตจริงของ Backend  
+- **โลโก้** — วาง `client/public/logo.png` แล้วรีเฟรชหน้าเว็บ
+
+---
+
+## Checklist ตรวจด้วยตนเอง (หลังรัน local)
+
+1. หน้าแรก → เข้าใช้งาน → Dashboard หลัง onboarding  
+2. Settings บันทึกได้  
+3. สร้างเอกสาร → เปิด Preview → theme / โลโก้ แสดงถูกต้อง  
+
+---
+
+## License
 
 © 2026 SabaiBill. All rights reserved.
-# การตรวจสอบการเชื่อม Frontend–Backend และโลโก้
-
-## วิธีรัน Backend และ Frontend แบบถูกต้อง
-
-### 1) รัน Backend ก่อน (ที่ root โปรเจกต์)
-
-```bash
-cd f:\sabaibill
-npm run dev
-```
-
-- Server จะขึ้นที่ **port 3001** (หรือถ้าถูกใช้อยู่จะลอง 3002, 3003 ตามลำดับ)
-- ถ้าเทอร์มินัลขึ้นว่า `Server is running on port 3002` (หรือเลขอื่น) ให้จำเลขพอร์ตนี้ไว้สำหรับขั้นตอน 3
-
-### 2) รัน Frontend (เปิดเทอร์มินัลใหม่)
-
-```bash
-cd f:\sabaibill\client
-npm run dev
-```
-
-- เปิดเบราว์เซอร์ไปที่ **http://localhost:5173** (หรือเลขที่ Vite แสดง เช่น 5174 ถ้า 5173 ถูกใช้)
-
-### 3) ถ้า Backend ใช้พอร์ตไม่ใช่ 3001
-
-ถ้า Backend ขึ้นที่พอร์ตอื่น (เช่น 3002) เพราะ 3001 ถูกใช้:
-
-- สร้างหรือแก้ไฟล์ `client/.env` ให้มีบรรทัด:
-  ```env
-  VITE_API_URL=http://localhost:3002
-  ```
-  (เปลี่ยน 3002 เป็นเลขพอร์ตที่ Backend แสดงจริง)
-- จากนั้น **รัน Frontend ใหม่** (หยุดแล้ว `npm run dev` อีกครั้ง) เพื่อให้อ่านค่า `.env`
-
----
-
-## สิ่งที่ทำแล้ว
-
-- **Backend**: รัน `npm run dev` ที่ root → server ขึ้นที่ port 3001 (หรือพอร์ตถัดไปถ้า 3001 ถูกใช้)
-- **Frontend**: รัน `npm run build` ใน `client/` → build ผ่านไม่มี error
-
-## ขั้นตอนตรวจสอบด้วยตัวเอง (Manual)
-
-1. **ใส่ไฟล์โลโก้**: วาง `logo.png` ที่ `client/public/logo.png` แล้วรัน frontend เปิด http://localhost:5173 — ตรวจว่า favicon และ navbar แสดงโลโก้
-2. **เข้าใช้งาน → Dashboard**: จากหน้าแรกกดเข้าใช้งานแล้วดูว่าหน้า Dashboard โหลดและดึงรายการเอกสารได้ (หลัง onboarding)
-3. **Settings**: เปิด Settings แก้ไขแล้วบันทึก — ตรวจว่า PUT `/api/settings` ทำงาน
-4. **Preview เอกสาร**: เปิดเอกสารใดๆ — ตรวจว่า theme และโลโก้ (หรือ fallback `/logo.png`) แสดงถูกต้อง
-
-## Environment
-
-- Backend: `DATABASE_URL`, `PORT`, `FRONTEND_URL`, `JWT_SECRET` ตาม [`.env.example`](./.env.example)
-- Frontend: `VITE_API_URL` ใน `client/.env` (dev; ค่าเริ่มต้น `http://localhost:3001` ถ้า Backend ใช้พอร์ตอื่นให้ตั้งให้ตรง) — production build ต้องตั้ง `VITE_API_URL` ให้ตรง URL สาธารณะ (ดู [DEPLOY.md](./DEPLOY.md))

@@ -2,7 +2,7 @@
 # Docs: https://render.com/docs/blueprint-spec
 #
 # Free tier: cold start can take ~1 min when idle; SQLite on ephemeral disk may reset on redeploy.
-# For persistent DB on Render you need a paid plan + disk — see DEPLOY.md section 4.1.
+# For persistent DB on Render you need a paid plan + disk — see README.md (Deploy section).
 #
 # Before first successful client build, set in the Render dashboard (Build environment):
 #   VITE_API_URL = https://<your-service-name>.onrender.com
