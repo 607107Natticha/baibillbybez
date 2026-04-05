@@ -1,58 +1,36 @@
 /**
  * Base URL for API calls (no trailing slash).
- * - If VITE_API_URL is set at build time → use it (split frontend/backend hosts).
- * - Dev (vite): default http://localhost:3001.
- * - Production without VITE_API_URL → same origin as the SPA (single-host deploy, avoids CORS).
+ * Production build ใส่ flag ใน index.html (vite plugin) → ใช้ origin เดียวกับหน้าเว็บ แม้มี VITE_API_URL เก่าใน bundle
+ * Dev: default http://localhost:3001
+ * แยกโดเมน: build ด้วย VITE_SINGLE_HOST_API=false และตั้ง VITE_API_URL
  */
 export function getApiBase() {
   const raw = import.meta.env.VITE_API_URL;
-  const forceSame =
+
+  if (
     import.meta.env.PROD &&
-    String(import.meta.env.VITE_SAME_ORIGIN_API || '').toLowerCase() === 'true';
-
-  let resolved;
-  let branch;
-
-  if (forceSame && typeof window !== 'undefined' && window.location?.origin) {
-    resolved = window.location.origin;
-    branch = 'force-same-origin-env';
-  } else if (raw != null && String(raw).trim() !== '') {
-    resolved = String(raw).trim().replace(/\/$/, '');
-    branch = 'vite-env';
-  } else if (import.meta.env.DEV) {
-    resolved = 'http://localhost:3001';
-    branch = 'dev-default';
-  } else if (typeof window !== 'undefined' && window.location?.origin) {
-    resolved = window.location.origin;
-    branch = 'prod-same-origin-fallback';
-  } else {
-    resolved = 'http://localhost:3001';
-    branch = 'ssr-fallback';
+    typeof window !== 'undefined' &&
+    window.__SABAIBILL_USE_PAGE_ORIGIN_FOR_API__ === true &&
+    window.location?.origin
+  ) {
+    return window.location.origin;
   }
 
-  // #region agent log
-  fetch('http://127.0.0.1:7553/ingest/733d9fd1-9b7d-4324-82db-c4651f3a2a34', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '16e659' },
-    body: JSON.stringify({
-      sessionId: '16e659',
-      hypothesisId: 'H1',
-      location: 'apiBase.js:getApiBase',
-      message: 'API base resolution',
-      data: {
-        branch,
-        resolved,
-        forceSameOriginFlag: forceSame,
-        rawViteApiUrl: raw === undefined ? '(undefined)' : String(raw),
-        isDev: !!import.meta.env.DEV,
-        isProd: !!import.meta.env.PROD,
-        pageOrigin: typeof window !== 'undefined' ? window.location?.origin : null,
-      },
-      timestamp: Date.now(),
-      runId: 'post-fix',
-    }),
-  }).catch(() => {});
-  // #endregion
+  const forceSameEnv =
+    import.meta.env.PROD &&
+    String(import.meta.env.VITE_SAME_ORIGIN_API || '').toLowerCase() === 'true';
+  if (forceSameEnv && typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
 
-  return resolved;
+  if (raw != null && String(raw).trim() !== '') {
+    return String(raw).trim().replace(/\/$/, '');
+  }
+  if (import.meta.env.DEV) {
+    return 'http://localhost:3001';
+  }
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return 'http://localhost:3001';
 }

@@ -262,14 +262,15 @@ VITE_API_URL=http://localhost:PORT_ที่_backend_ใช้จริง
 | `FRONTEND_URL` | Backend | CORS — origin ของหน้าเว็บ คั่นหลายตัวด้วย comma |
 | `CORS_ALLOWED_ORIGINS` | Backend | เพิ่ม origin ที่อนุญาต (คั่นด้วย comma) ใช้คู่กับ `FRONTEND_URL` เมื่อมีหลายหน้าเว็บ |
 | `VITE_API_URL` | ตอน build client | ถ้าไม่ตั้ง = production ใช้ origin เดียวกับหน้าเว็บ; ตั้งเมื่อ API คนละโดเมน |
-| `VITE_SAME_ORIGIN_API` | ตอน build client | ใส่ `true` เมื่อโฮสต์เดียวแต่ยังมี `VITE_API_URL` เก่าใน build (บังคับยิง API ที่ origin เดียวกับ SPA) |
+| `VITE_SAME_ORIGIN_API` | ตอน build client | ทางเลือก: `true` = บังคับ same-origin (ส่วนใหญ่ build ฝัง flag ใน `index.html` ให้แล้ว) |
+| `VITE_SINGLE_HOST_API` | ตอน build client | ใส่ `false` เมื่อแยกโดเมน SPA/API (ไม่ฝังสคริปต์ same-origin) |
 | `JWT_SECRET` | Backend | ค่าใน `.env.example` (โค้ดเดิมรองรับ JWT; flow ปัจจุบันไม่บังคับส่ง token จากเบราว์เซอร์) |
 
 ---
 
 ## แก้ปัญหาที่พบบ่อย
 
-- **CORS / `No 'Access-Control-Allow-Origin'`** — มักเกิดจาก SPA ชี้ API คนละโดเมน (เช่น `billbybz`) แต่ API จริงอยู่ที่โดเมนเดียวกับหน้าเว็บ: ตั้ง **`VITE_SAME_ORIGIN_API=true`** ตอน build (มีใน [`render.yaml`](./render.yaml)) หรือลบ `VITE_API_URL` ออกจาก Build env แล้ว deploy ใหม่ ถ้าแยกโดเมนจริง ให้ตั้ง `FRONTEND_URL` / `CORS_ALLOWED_ORIGINS` บน API  
+- **CORS / ยังยิงไปโดเมน API เก่า (`billbybz` ฯลฯ)** — โปรเจกต์นี้ build production จะฝังสคริปต์ใน `index.html` ให้เรียก API ที่ **origin เดียวกับหน้าเว็บ** โดยอัตโนมัติ — deploy โค้ดล่าสุดแล้ว **Clear build cache** บน Render ถ้าแยกโดเมนจริง ให้ build ด้วย **`VITE_SINGLE_HOST_API=false`** + `VITE_API_URL` และตั้ง CORS บน backend  
 - **500 ตอนบันทึก** — รัน `npx prisma db push` และตรวจว่า Backend รันอยู่  
 - **Frontend เรียก API ไม่ถึง** — dev: ตั้ง `VITE_API_URL` ให้ตรงพอร์ต Backend  
 - **โลโก้** — วาง `client/public/logo.png` แล้วรีเฟรชหน้าเว็บ

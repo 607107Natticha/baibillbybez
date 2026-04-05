@@ -4,7 +4,7 @@
 # Free tier: cold start can take ~1 min when idle; SQLite on ephemeral disk may reset on redeploy.
 # For persistent DB on Render you need a paid plan + disk — see README.md (Deploy section).
 #
-# Build: โฮสต์เดียว — ไม่ต้องตั้ง VITE_API_URL หรือตั้ง VITE_SAME_ORIGIN_API=true ถ้ายังมี VITE_API_URL เก่าค้าง
+# Build: โฮสต์เดียว — client build ฝังสคริปต์บังคับ API ที่ origin เดียวกับหน้าเว็บ (ไม่พึ่ง VITE_API_URL บน Render)
 # แยก API คนละ service: ตั้ง VITE_API_URL + บน backend ตั้ง FRONTEND_URL / CORS_ALLOWED_ORIGINS
 
 services:
@@ -22,5 +22,3 @@ services:
         value: file:./dev.db
       - key: JWT_SECRET
         generateValue: true
-      - key: VITE_SAME_ORIGIN_API
-        value: "true"
