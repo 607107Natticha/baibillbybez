@@ -3,17 +3,9 @@
 ## Live demo / กรรมการ
 
 - **URL ทดลอง:** _(ใส่หลัง deploy — ตัวอย่าง `https://sabai-bill.onrender.com`)_
-- **ที่เก็บโค้ด (GitHub):** _(ใส่ลิงก์ repository หลัง push — ดูคำสั่งด้านล่าง)_
+- **ที่เก็บโค้ด (GitHub):** [github.com/beetwowin2-coder/billbybz](https://github.com/beetwowin2-coder/billbybz)
 
-**Push ขึ้น GitHub (ครั้งแรก):** สร้าง repository ว่างบน GitHub (ไม่ต้องติ๊ก README) แล้วรันที่โฟลเดอร์โปรเจกต์:
-
-```bash
-git config --global --add safe.directory D:/sabaibill
-git remote add origin https://github.com/<USER>/<REPO>.git
-git push -u origin main
-```
-
-ถ้าเครื่องติดตั้ง [GitHub CLI](https://cli.github.com/) แล้ว login แล้ว สามารถใช้ `gh repo create <REPO> --private --source=. --remote=origin --push` แทนได้
+**Clone โปรเจกต์:** `git clone https://github.com/beetwowin2-coder/billbybz.git`
 - **ลำดับทดลอง:** เปิด URL → สมัครสมาชิก (email + PIN 6 หลัก) → กรอก onboarding ข้อมูลบริษัท → สร้างเอกสาร (QT/SO/DO/IV) → ลองพิมพ์หรือบันทึก PDF จากหน้า Preview
 - **ข้อจำกัด:** SQLite บนแพลตฟอร์มที่ดิสก์ไม่ถาวร อาจรีเซ็ตข้อมูลเมื่อ redeploy — ถ้าต้องการเก็บถาวร ให้ใช้ Persistent Disk หรือ DB แบบ hosted (ดู [DEPLOY.md](./DEPLOY.md))  
 - **Google Login:** ใช้ได้เมื่อตั้งค่า OAuth ใน Google Cloud ให้ตรง **Authorized JavaScript origins** และ redirect ของ URL จริง — ถ้ายังไม่ตั้ง ให้ใช้การเข้าสู่ระบบด้วย email + PIN
