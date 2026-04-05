@@ -2,7 +2,7 @@
 
 ## Live demo / กรรมการ
 
-- **URL ทดลอง:** _(ใส่หลัง deploy — ตัวอย่าง `https://sabai-bill.onrender.com`)_
+- **URL ทดลอง:** [https://baibillbybez.onrender.com](https://baibillbybez.onrender.com)
 - **ที่เก็บโค้ด (GitHub):** [github.com/607107Natticha/baibillbybez](https://github.com/607107Natticha/baibillbybez)
 
 **Clone โปรเจกต์:** `git clone https://github.com/607107Natticha/baibillbybez.git`
