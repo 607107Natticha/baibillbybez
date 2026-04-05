@@ -20,6 +20,14 @@ git push -u origin main
 
 รายละเอียด deploy แบบโฮสต์เดียว / Render Blueprint — ดู [DEPLOY.md](./DEPLOY.md)
 
+**ตรวจสอบหลัง deploy (กรรมการ / smoke):**
+
+```bash
+SMOKE_BASE_URL=https://your-demo.example.com npm run smoke
+```
+
+จากนั้นเปิด URL ในเบราว์เซอร์ — ลองครบ flow: สมัคร → onboarding → สร้างเอกสาร → หน้า Preview → พิมพ์หรือบันทึก PDF
+
 ---
 
 ## 🚀 การติดตั้งและรันระบบ
