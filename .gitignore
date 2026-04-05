@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Environment (keep *.example tracked)
+.env
+.env.*
+!.env.example
+!**/.env.example
+client/.env
+client/.env.*
+!client/.env.example
+
+# Build output
+client/dist/
+dist/
+
+# SQLite / Prisma local DB
+prisma/*.db
+prisma/*.db-journal
+*.db
+*.db-journal
+
+# Logs & debug
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.suo
+
+# Vite / tooling
+client/.vite/
+*.local

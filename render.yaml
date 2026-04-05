@@ -1,0 +1,25 @@
+# SabaiBill on Render (single Web service: API + static SPA)
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Before first successful client build, set in the Render dashboard (Build environment):
+#   VITE_API_URL = https://<your-service-name>.onrender.com
+# Then trigger a new deploy so the SPA calls the correct API origin.
+#
+# Optional: add a Persistent Disk mounted at /var/sabaibill-data and set
+#   DATABASE_URL = file:/var/sabaibill-data/dev.db
+# so SQLite survives redeploys (free tier has limits; see Render docs).
+
+services:
+  - type: web
+    name: sabai-bill
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm ci --prefix client && npm run build:client && npx prisma generate
+    startCommand: npx prisma db push && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: JWT_SECRET
+        generateValue: true

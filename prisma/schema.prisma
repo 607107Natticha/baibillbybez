@@ -1,0 +1,152 @@
+// sabaibill-backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ตาราง Users: สำหรับเก็บข้อมูลล็อกอิน
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String?  @unique  // Email สำหรับ login (optional สำหรับ backward compatibility)
+  googleId     String?  @unique  // Google OAuth ID
+  phoneNumber  String?  @unique  // เบอร์โทร (optional)
+  pinHash      String?  // เก็บ PIN 6 หลักที่เข้ารหัสแล้ว (bcrypt) - optional สำหรับ Google login
+  isOnboarded  Boolean  @default(false) // ตรวจสอบว่ากรอกข้อมูลบริษัทแล้วหรือยัง
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ตาราง CompanySettings: เก็บข้อมูลบริษัท (มีแถวเดียวเสมอ)
+model CompanySetting {
+  id                Int      @id @default(autoincrement())
+  companyName       String?  // ชื่อบริษัทภาษาไทย
+  companyNameEn     String?  // ชื่อบริษัทภาษาอังกฤษ
+  address           String?
+  addressEn         String?  // ที่อยู่บริษัทภาษาอังกฤษ
+  country           String?  @default("ไทย") // ประเทศ
+  postalCode        String?  // รหัสไปรษณีย์
+  taxId             String?
+  phone             String?
+  email             String?  // อีเมลบริษัท
+  logoText          String?  @default("RD")
+  logoImage         String?  // เก็บเป็น Base64 string หรือ URL
+  
+  // ข้อมูลธนาคาร
+  bankName          String?  @default("kbank")
+  customBankName    String?
+  customBankLogo    String?
+  bankAccountName   String?
+  bankAccountNumber String?
+
+  // เงื่อนไขท้ายบิล
+  condQT            String?
+  condSO            String?
+  condDO            String?
+  condIV            String?
+
+  // การปรับแต่งเทมเพลต
+  templateTheme     String?  @default("blue")   // blue, green, pink, black, red, yellow
+  templateLayout    String?  @default("classic") // classic, modern, minimal, compact, professional
+  fontFamily        String?  @default("Sarabun") // Sarabun, Prompt, Kanit, Noto Sans Thai
+
+  // ลายเซ็น
+  signatureImage    String?  // ลายเซ็นบริษัท (Base64)
+  signatureMethod   String?  @default("upload") // upload or draw
+  preparerName      String?  // ชื่อผู้จัดทำ (ใช้ในใบเสนอราคาและเอกสารอื่น)
+  paymentQrImage    String?  // QR Code สำหรับรับชำระเงิน (Base64) แสดงท้ายใบแจ้งหนี้และใบเสนอราคา
+
+  // สกุลเงิน (สำหรับลูกค้าต่างชาติ)
+  defaultCurrency   String?  @default("THB")
+  currencySymbol    String?  @default("฿")
+  secondaryCurrency String? // เช่น USD
+  exchangeRateToSecondary Float? // อัตราเทียบสกุลหลัก เช่น 35 = 1 USD ต่อ 35 THB
+
+  updatedAt         DateTime @updatedAt
+}
+
+// ตาราง Documents: หัวบิลเอกสาร
+model Document {
+  id              Int            @id @default(autoincrement())
+  type            String         // QT, SO, DO, IV
+  no              String         @unique // เลขที่เอกสาร ห้ามซ้ำ
+  date            DateTime       @default(now())
+  dueDate         DateTime?
+  
+  // ข้อมูลลูกค้า (Snapshot ณ วันเปิดบิล)
+  customer        String?
+  customerEn      String?  // ชื่อลูกค้าภาษาอังกฤษ (Snapshot)
+  customerAddress String?
+  customerAddressEn String? // ที่อยู่ลูกค้าภาษาอังกฤษ (Snapshot)
+  customerTaxId   String?
+  customerPhone   String?
+  customerEmail   String?  // อีเมลลูกค้า (Snapshot)
+  
+  // การคำนวณเงิน
+  vatType         String         @default("none") // none, exclude, include
+  discountType    String         @default("amount") // amount, percent
+  discountValue   Float          @default(0)
+  whtRate         Float          @default(0)
+  total           Float          @default(0) // ยอดรวมก่อนหัก WHT (Base + VAT)
+  netPayable      Float?         // ยอดสุทธิที่ลูกค้าจ่าย (หลังหัก ณ ที่จ่าย)
+  
+  // ข้อมูลอื่นๆ
+  note            String?
+  status          String         @default("ร่าง")
+  refNo           String?        // อ้างอิงเอกสารก่อนหน้า
+  poNumber        String?        // PO ลูกค้า
+  
+  // เฉพาะใบส่งของ (DO)
+  hidePrice       Boolean        @default(false)
+  deliveryDate    DateTime?
+  deliveryMethod  String?
+  recipient       String?        // ผู้รับของ (DO)
+
+  // ลายเซ็น
+  preparerName    String?        // ชื่อผู้จัดทำ
+  approverName    String?        // ชื่อผู้อนุมัติ
+
+  items           DocumentItem[] // ความสัมพันธ์ 1-to-Many
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+// ตาราง DocumentItems: รายการสินค้าในบิล
+model DocumentItem {
+  id         Int      @id @default(autoincrement())
+  documentId Int
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  name       String
+  qty        Float    @default(1)
+  unit       String?  // หน่วย เช่น ชิ้น, กล่อง, เมตร, ชั่วโมง
+  price      Float    @default(0)
+}
+
+// ตาราง Customers: จำข้อมูลลูกค้าอัตโนมัติ
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  nameEn    String?  // ชื่อลูกค้าภาษาอังกฤษ
+  address   String?
+  addressEn String?  // ที่อยู่ลูกค้าภาษาอังกฤษ
+  taxId     String?
+  phone     String?  // เบอร์โทรศัพท์ลูกค้า
+  email     String?  // อีเมลลูกค้า
+  updatedAt DateTime @updatedAt
+}
+
+// ตาราง Products: จำราคาสินค้าล่าสุดอัตโนมัติ
+model Product {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  price      Float    @default(0)
+  unit       String?  // หน่วยล่าสุด
+  usageCount Int      @default(0) // นับจำนวนครั้งที่ใช้สินค้านี้
+  updatedAt  DateTime @updatedAt
+}

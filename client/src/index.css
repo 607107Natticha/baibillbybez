@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fluid typography: scales with viewport and respects user font-size */
+html {
+  font-size: clamp(16px, 2.5vw, 18px);
+}
+
+body {
+  font-size: 1rem;
+  font-family: 'Noto Sans Thai', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Touch target: minimum 48x48px for buttons/links (senior-friendly) */
+@layer utilities {
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #4B5563;
+  opacity: 1;
+}
+
+* {
+  -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+}
+
+/* Senior-friendly: input/textarea borders and focus (clear tap targets) */
+@layer components {
+  .input-field {
+    @apply border-2 border-gray-400 rounded-xl bg-gray-50 transition-colors duration-200;
+  }
+  .input-field:focus {
+    @apply outline-none border-brand-primary ring-2 ring-brand-primary ring-opacity-30;
+  }
+}
+
+/* Motion: slide-down + fade-in for new rows; page fade-in */
+@keyframes slideDownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-slideDownFadeIn {
+  animation: slideDownFadeIn 0.25s ease-out forwards;
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+@keyframes scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Skeleton loading */
+.skeleton {
+  @apply bg-gray-200 rounded animate-pulse;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 5mm;
+    size: A4;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  
+  .print\:bg-white {
+    background-color: white !important;
+  }
+  
+  .print\:bg-gray-900 {
+    background-color: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  
+  .print\:w-full {
+    width: 100% !important;
+  }
+
+  /* Scale down document content to fit A4 page */
+  .min-h-screen {
+    min-height: unset !important;
+    padding: 0 !important;
+  }
+
+  /* Single-page print: zoom so entire content fits one A4 (no clipping), centered (--print-zoom set by JS) */
+  .print-fit-one-page {
+    zoom: var(--print-zoom, 1);
+    width: 210mm !important;
+    max-width: 210mm !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Shrink font sizes and paddings for print */
+  .max-w-4xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Tighten padding in all layouts */
+  .p-8 {
+    padding: 4mm !important;
+  }
+
+  .p-4, .p-6 {
+    padding: 1.5mm !important;
+  }
+
+  .mb-8, .mt-8 {
+    margin-bottom: 1.5mm !important;
+    margin-top: 1.5mm !important;
+  }
+
+  .mb-6, .mt-6 {
+    margin-bottom: 1mm !important;
+    margin-top: 1mm !important;
+  }
+
+  .mb-4, .mt-4 {
+    margin-bottom: 0.8mm !important;
+    margin-top: 0.8mm !important;
+  }
+
+  .mb-3, .mt-3 {
+    margin-bottom: 0.6mm !important;
+    margin-top: 0.6mm !important;
+  }
+
+  .mb-2, .mt-2 {
+    margin-bottom: 0.4mm !important;
+    margin-top: 0.4mm !important;
+  }
+
+  /* Reduce table spacing */
+  table {
+    font-size: 0.85em !important;
+  }
+
+  .py-3 {
+    padding-top: 0.8mm !important;
+    padding-bottom: 0.8mm !important;
+  }
+
+  .py-2 {
+    padding-top: 0.4mm !important;
+    padding-bottom: 0.4mm !important;
+  }
+
+  .py-4 {
+    padding-top: 1mm !important;
+    padding-bottom: 1mm !important;
+  }
+
+  /* Compact signature section */
+  .mt-16, .mt-20 {
+    margin-top: 2mm !important;
+  }
+
+  /* Reduce footer spacing */
+  .pt-4 {
+    padding-top: 1mm !important;
+  }
+
+  .-mx-8 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .px-8 {
+    padding-left: 2mm !important;
+    padding-right: 2mm !important;
+  }
+
+  /* Signature and totals: keep together, avoid page break before */
+  .flex.justify-end {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* รองรับเอกสารที่มีสินค้าเยอะ - แยกหน้าได้แต่ header ต้องแสดงทุกหน้า */
+  table {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+  
+  table thead {
+    display: table-header-group;
+    break-inside: avoid;
+  }
+  
+  table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* ป้องกัน elements สำคัญแยกหน้า */
+  .signature-section, .payment-info, .terms-section,
+  .document-summary, .document-totals {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* ให้ footer อยู่ล่างสุดของแต่ละหน้า */
+  .document-footer {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* แสดงสีพื้นหลังและ border เวลาพิมพ์ */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
