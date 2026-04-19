@@ -8,11 +8,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <title>Sabaibill</title>
+    <!-- #fixed-portal: positioned above BottomNav on mobile, at bottom on desktop -->
+    <style>
+      #fixed-portal {
+        position: fixed;
+        /* mobile: BottomNav ≈ 65px + iOS safe-area-inset-bottom */
+        bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        pointer-events: none;
+      }
+      @media (min-width: 1024px) {
+        /* desktop: no BottomNav, sit at viewport bottom */
+        #fixed-portal { bottom: 0; }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <!-- fixed-portal: container is fixed → children inside don't need position:fixed (avoids stacking-context trap) -->
-    <div id="fixed-portal" style="position:fixed;bottom:0;left:0;right:0;z-index:9999;pointer-events:none;"></div>
+    <div id="fixed-portal"></div>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>

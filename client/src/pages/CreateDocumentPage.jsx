@@ -335,32 +335,27 @@ const CreateDocumentPage = () => {
 
   // #region agent log — debug session 5f9f11
   useEffect(() => {
-    // wait one frame so portal child renders
     requestAnimationFrame(() => {
       const portal = document.getElementById('fixed-portal');
       const saveBarEl = portal?.firstElementChild;
       const bottomNav = document.querySelector('nav[aria-label="Bottom navigation"]');
-      const saveRect = saveBarEl?.getBoundingClientRect();
-      const navRect = bottomNav?.getBoundingClientRect();
+      const sr = saveBarEl?.getBoundingClientRect();
+      const nr = bottomNav?.getBoundingClientRect();
       const vp = window.innerHeight;
-      const saveBarMarginBottom = saveBarEl ? window.getComputedStyle(saveBarEl).marginBottom : 'N/A';
-
-      const data = {
-        vp,
-        saveBarExists: !!saveBarEl,
-        saveRect: saveRect ? { top: Math.round(saveRect.top), bottom: Math.round(saveRect.bottom), height: Math.round(saveRect.height) } : null,
-        saveBarMarginBottom,
-        navExists: !!bottomNav,
-        navRect: navRect ? { top: Math.round(navRect.top), bottom: Math.round(navRect.bottom), height: Math.round(navRect.height) } : null,
-        overlap: (saveRect && navRect) ? !(saveRect.bottom <= navRect.top || saveRect.top >= navRect.bottom) : 'unknown',
-        portalPosition: portal ? window.getComputedStyle(portal).position : 'N/A',
-      };
+      const portalBottom = portal ? window.getComputedStyle(portal).bottom : 'N/A';
+      const overlap = (sr && nr) ? !(sr.bottom <= nr.top || sr.top >= nr.bottom) : 'unknown';
+      // log all values flat so visible without expanding
       // eslint-disable-next-line no-console
-      console.error('[DEBUG-5f9f11] bounding rects', data);
+      console.error(
+        `[DEBUG-5f9f11] POST-FIX | vp=${vp} portalBottom=${portalBottom}`,
+        `| saveBar: top=${sr ? Math.round(sr.top) : 'N/A'} bottom=${sr ? Math.round(sr.bottom) : 'N/A'} h=${sr ? Math.round(sr.height) : 'N/A'}`,
+        `| nav: top=${nr ? Math.round(nr.top) : 'N/A'} bottom=${nr ? Math.round(nr.bottom) : 'N/A'} h=${nr ? Math.round(nr.height) : 'N/A'}`,
+        `| overlap=${overlap}`,
+      );
       fetch('http://127.0.0.1:7280/ingest/e40bc125-5b09-4e57-b5e4-59ae8cbc556f', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '5f9f11' },
-        body: JSON.stringify({ sessionId: '5f9f11', location: 'CreateDocumentPage.jsx:bounding-rects', message: 'bounding rect check', data, timestamp: Date.now(), hypothesisId: 'H-F,H-G,H-H' }),
+        body: JSON.stringify({ sessionId: '5f9f11', runId: 'post-fix', location: 'CreateDocumentPage.jsx:post-fix', message: 'post-fix rect check', data: { vp, portalBottom, saveTop: sr ? Math.round(sr.top) : null, saveBottom: sr ? Math.round(sr.bottom) : null, saveH: sr ? Math.round(sr.height) : null, navTop: nr ? Math.round(nr.top) : null, navBottom: nr ? Math.round(nr.bottom) : null, navH: nr ? Math.round(nr.height) : null, overlap }, timestamp: Date.now(), hypothesisId: 'H-J' }),
       }).catch(() => {});
     });
   }, []);
@@ -371,7 +366,7 @@ const CreateDocumentPage = () => {
       role="toolbar"
       aria-label={language === 'th' ? 'แถบบันทึกเอกสาร' : 'Save document toolbar'}
       style={{ pointerEvents: 'auto' }}
-      className="w-full bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb mb-[5.75rem] lg:mb-0"
+      className="w-full bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden"
     >
       <div className="max-w-3xl mx-auto">
         <button
