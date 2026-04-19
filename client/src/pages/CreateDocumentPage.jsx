@@ -327,7 +327,7 @@ const CreateDocumentPage = () => {
   };
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-52 lg:pb-24">
       {lastDraftSavedAt && !location.state?.sourceDoc && (
         <p className="text-xs text-gray-500 text-right">
           {language === 'th' ? 'บันทึกฉบับร่างอัตโนมัติเมื่อ ' : 'Draft auto-saved at '}{formatDraftTime(lastDraftSavedAt)}
@@ -871,7 +871,7 @@ const CreateDocumentPage = () => {
         </div>
 
       {/* Sticky Save Bar — มุมล่างจอ, กดได้ตลอด (Senior-Friendly) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb">
+      <div className="fixed bottom-24 left-0 right-0 z-[60] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb lg:bottom-0 lg:z-40">
         <div className="max-w-3xl mx-auto">
           <button
             type="button"
