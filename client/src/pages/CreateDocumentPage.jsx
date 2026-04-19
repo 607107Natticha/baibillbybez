@@ -333,6 +333,30 @@ const CreateDocumentPage = () => {
     ? document.getElementById('fixed-portal')
     : null;
 
+  // #region agent log — debug session 5f9f11
+  useEffect(() => {
+    const el = document.getElementById('fixed-portal');
+    const data = {
+      portalExists: !!el,
+      portalPosition: el ? window.getComputedStyle(el).position : 'N/A',
+      portalBottom: el ? window.getComputedStyle(el).bottom : 'N/A',
+      portalZIndex: el ? window.getComputedStyle(el).zIndex : 'N/A',
+      portalChildren: el ? el.childElementCount : 'N/A',
+      buildVersion: document.querySelector('script[src*="index-"]')?.src ?? 'unknown',
+      mbClassInCSS: [...document.styleSheets].some(ss => {
+        try { return [...ss.cssRules].some(r => r.cssText?.includes('5.75rem')); } catch { return false; }
+      }),
+    };
+    // eslint-disable-next-line no-console
+    console.error('[DEBUG-5f9f11] portal+CSS check', data);
+    fetch('http://127.0.0.1:7280/ingest/e40bc125-5b09-4e57-b5e4-59ae8cbc556f', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '5f9f11' },
+      body: JSON.stringify({ sessionId: '5f9f11', location: 'CreateDocumentPage.jsx:portal-check', message: 'portal+CSS runtime check', data, timestamp: Date.now(), hypothesisId: 'H-A,H-B,H-C,H-D' }),
+    }).catch(() => {});
+  }, []);
+  // #endregion
+
   const saveBar = (
     <div
       role="toolbar"
