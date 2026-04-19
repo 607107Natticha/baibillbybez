@@ -11,6 +11,8 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- fixed-portal: container is fixed → children inside don't need position:fixed (avoids stacking-context trap) -->
+    <div id="fixed-portal" style="position:fixed;bottom:0;left:0;right:0;z-index:9999;pointer-events:none;"></div>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>

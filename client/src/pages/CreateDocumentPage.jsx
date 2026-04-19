@@ -327,34 +327,40 @@ const CreateDocumentPage = () => {
     return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${language === 'th' ? 'น.' : ''}`;
   };
 
-  /* Primary CTA: viewport-fixed (ไม่เลื่อนตามเนื้อหา); portal → body เพื่อ stacking ถูกต้อง */
+  /* Primary CTA: portal เข้า #fixed-portal ที่เป็น position:fixed ตั้งแต่ใน HTML
+     → ไม่ต้องพึ่ง position:fixed ใน React tree ซึ่งอาจถูก stacking context บัง */
+  const portalTarget = typeof document !== 'undefined'
+    ? document.getElementById('fixed-portal')
+    : null;
+
   const saveBar = (
-      <div
-        role="toolbar"
-        aria-label={language === 'th' ? 'แถบบันทึกเอกสาร' : 'Save document toolbar'}
-        className="fixed inset-x-0 bottom-0 z-[100] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb max-lg:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))]"
-      >
-        <div className="max-w-3xl mx-auto">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`min-h-touch w-full flex items-center justify-center px-6 py-4 text-lg font-bold rounded-2xl shadow-lg transition touch-target ${saveSuccess ? 'bg-emerald-600 text-white' : 'bg-brand-primary text-white hover:bg-pink-500 disabled:bg-gray-400'}`}
-          >
-            {saveSuccess ? (
-              <>
-                <Check className="w-5 h-5 mr-2 shrink-0 animate-[scale-in_0.3s_ease-out]" />
-                {language === 'th' ? 'บันทึกแล้ว' : 'Saved'}
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5 mr-2 shrink-0" />
-                {loading ? (language === 'th' ? 'กำลังบันทึก...' : 'Saving...') : (language === 'th' ? 'บันทึกเอกสาร' : 'Save Document')}
-              </>
-            )}
-          </button>
-        </div>
+    <div
+      role="toolbar"
+      aria-label={language === 'th' ? 'แถบบันทึกเอกสาร' : 'Save document toolbar'}
+      style={{ pointerEvents: 'auto' }}
+      className="w-full bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb mb-[5.75rem] lg:mb-0"
+    >
+      <div className="max-w-3xl mx-auto">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
+          className={`min-h-touch w-full flex items-center justify-center px-6 py-4 text-lg font-bold rounded-2xl shadow-lg transition touch-target ${saveSuccess ? 'bg-emerald-600 text-white' : 'bg-brand-primary text-white hover:bg-pink-500 disabled:bg-gray-400'}`}
+        >
+          {saveSuccess ? (
+            <>
+              <Check className="w-5 h-5 mr-2 shrink-0 animate-[scale-in_0.3s_ease-out]" />
+              {language === 'th' ? 'บันทึกแล้ว' : 'Saved'}
+            </>
+          ) : (
+            <>
+              <Save className="w-5 h-5 mr-2 shrink-0" />
+              {loading ? (language === 'th' ? 'กำลังบันทึก...' : 'Saving...') : (language === 'th' ? 'บันทึกเอกสาร' : 'Save Document')}
+            </>
+          )}
+        </button>
       </div>
+    </div>
   );
 
   return (
@@ -903,7 +909,7 @@ const CreateDocumentPage = () => {
         </div>
 
     </div>
-    {typeof document !== 'undefined' ? createPortal(saveBar, document.body) : null}
+    {portalTarget ? createPortal(saveBar, portalTarget) : null}
     </>
   );
 };
