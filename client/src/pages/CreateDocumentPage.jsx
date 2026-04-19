@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Calendar, Clock, Trash2, PlusCircle, EyeOff, Save, GripVertical, Check } from 'lucide-react';
@@ -326,7 +327,35 @@ const CreateDocumentPage = () => {
     return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${language === 'th' ? 'น.' : ''}`;
   };
 
+  const saveBar = (
+      <div
+        className="fixed left-0 right-0 z-[100] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb max-lg:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] lg:bottom-0"
+      >
+        <div className="max-w-3xl mx-auto">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={loading}
+            className={`min-h-touch w-full flex items-center justify-center px-6 py-4 text-lg font-bold rounded-2xl shadow-lg transition touch-target ${saveSuccess ? 'bg-emerald-600 text-white' : 'bg-brand-primary text-white hover:bg-pink-500 disabled:bg-gray-400'}`}
+          >
+            {saveSuccess ? (
+              <>
+                <Check className="w-5 h-5 mr-2 shrink-0 animate-[scale-in_0.3s_ease-out]" />
+                {language === 'th' ? 'บันทึกแล้ว' : 'Saved'}
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5 mr-2 shrink-0" />
+                {loading ? (language === 'th' ? 'กำลังบันทึก...' : 'Saving...') : (language === 'th' ? 'บันทึกเอกสาร' : 'Save Document')}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+  );
+
   return (
+    <>
     <div className="space-y-4 pb-52 lg:pb-24">
       {lastDraftSavedAt && !location.state?.sourceDoc && (
         <p className="text-xs text-gray-500 text-right">
@@ -351,7 +380,7 @@ const CreateDocumentPage = () => {
 
       {/* Modal เลือกจากรายชื่อลูกค้า */}
       {showCustomerPicker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="customer-picker-title">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="customer-picker-title">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col border-2 border-gray-200">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h2 id="customer-picker-title" className="text-xl font-bold text-gray-900">
@@ -870,30 +899,9 @@ const CreateDocumentPage = () => {
           </div>
         </div>
 
-      {/* Sticky Save Bar — มุมล่างจอ, กดได้ตลอด (Senior-Friendly) */}
-      <div className="fixed bottom-24 left-0 right-0 z-[60] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb lg:bottom-0 lg:z-40">
-        <div className="max-w-3xl mx-auto">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading}
-            className={`min-h-touch w-full flex items-center justify-center px-6 py-4 text-lg font-bold rounded-2xl shadow-lg transition touch-target ${saveSuccess ? 'bg-emerald-600 text-white' : 'bg-brand-primary text-white hover:bg-pink-500 disabled:bg-gray-400'}`}
-          >
-            {saveSuccess ? (
-              <>
-                <Check className="w-5 h-5 mr-2 shrink-0 animate-[scale-in_0.3s_ease-out]" />
-                {language === 'th' ? 'บันทึกแล้ว' : 'Saved'}
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5 mr-2 shrink-0" />
-                {loading ? (language === 'th' ? 'กำลังบันทึก...' : 'Saving...') : (language === 'th' ? 'บันทึกเอกสาร' : 'Save Document')}
-              </>
-            )}
-          </button>
-        </div>
-      </div>
     </div>
+    {typeof document !== 'undefined' ? createPortal(saveBar, document.body) : null}
+    </>
   );
 };
 
