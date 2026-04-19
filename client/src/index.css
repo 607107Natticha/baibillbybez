@@ -20,6 +20,10 @@ body {
     min-height: 48px;
     min-width: 48px;
   }
+  /* iOS notch / home indicator — used by BottomNav & sticky save bar */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }
 
 input::placeholder,

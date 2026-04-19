@@ -327,9 +327,12 @@ const CreateDocumentPage = () => {
     return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')} ${language === 'th' ? 'น.' : ''}`;
   };
 
+  /* Primary CTA: viewport-fixed (ไม่เลื่อนตามเนื้อหา); portal → body เพื่อ stacking ถูกต้อง */
   const saveBar = (
       <div
-        className="fixed left-0 right-0 z-[100] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb max-lg:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] lg:bottom-0"
+        role="toolbar"
+        aria-label={language === 'th' ? 'แถบบันทึกเอกสาร' : 'Save document toolbar'}
+        className="fixed inset-x-0 bottom-0 z-[100] bg-white border-t-2 border-gray-200 shadow-lg py-3 px-4 print:hidden safe-area-pb max-lg:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))]"
       >
         <div className="max-w-3xl mx-auto">
           <button
@@ -356,7 +359,7 @@ const CreateDocumentPage = () => {
 
   return (
     <>
-    <div className="space-y-4 pb-52 lg:pb-24">
+    <div className="space-y-4 pb-60 lg:pb-24">
       {lastDraftSavedAt && !location.state?.sourceDoc && (
         <p className="text-xs text-gray-500 text-right">
           {language === 'th' ? 'บันทึกฉบับร่างอัตโนมัติเมื่อ ' : 'Draft auto-saved at '}{formatDraftTime(lastDraftSavedAt)}
